@@ -15,11 +15,10 @@ function _init()
   end
 
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
-  pf1_next = 1
+  pf1_next = flr(rnd(6)+1)
 end
 
 function _update()
-
 end
 
 function _draw()
@@ -27,10 +26,11 @@ function _draw()
 	map(0)
   render_playfields()
   render_previews()
+  --print(pf1_next, 2, 2)
 end
 
 function render_previews()
-  draw_piece(1, 24, 12)
+  draw_piece(pf1_next, 24, 12)
 end
 
 function render_playfields()
@@ -69,11 +69,35 @@ function draw_piece(piece, x, y)
     spr(piece, x+4*3, y+4*1, 0.5, 0.5)
     spr(piece, x+4*4, y+4*1, 0.5, 0.5)
   elseif piece == 2 then
+    spr(piece, x+4*1, y+4*1, 0.5, 0.5)
+    spr(piece, x+4*2, y+4*1, 0.5, 0.5)
+    spr(piece, x+4*2, y+4*2, 0.5, 0.5)
+    spr(piece, x+4*3, y+4*2, 0.5, 0.5)
   elseif piece == 3 then
+    spr(piece, x+4*1, y+4*2, 0.5, 0.5)
+    spr(piece, x+4*2, y+4*1, 0.5, 0.5)
+    spr(piece, x+4*2, y+4*2, 0.5, 0.5)
+    spr(piece, x+4*3, y+4*1, 0.5, 0.5)
   elseif piece == 4 then
+    spr(piece, x+4*1, y+4*1, 0.5, 0.5)
+    spr(piece, x+4*2, y+4*1, 0.5, 0.5)
+    spr(piece, x+4*3, y+4*1, 0.5, 0.5)
+    spr(piece, x+4*3, y+4*2, 0.5, 0.5)
   elseif piece == 5 then
+    spr(piece, x+4*1, y+4*1, 0.5, 0.5)
+    spr(piece, x+4*1, y+4*2, 0.5, 0.5)
+    spr(piece, x+4*2, y+4*1, 0.5, 0.5)
+    spr(piece, x+4*3, y+4*1, 0.5, 0.5)
   elseif piece == 6 then
+    spr(piece, x+4*1, y+4*1, 0.5, 0.5)
+    spr(piece, x+4*2, y+4*1, 0.5, 0.5)
+    spr(piece, x+4*1, y+4*2, 0.5, 0.5)
+    spr(piece, x+4*2, y+4*2, 0.5, 0.5)
   elseif piece == 7 then
+    spr(piece, x+4*1, y+4*1, 0.5, 0.5)
+    spr(piece, x+4*2, y+4*1, 0.5, 0.5)
+    spr(piece, x+4*2, y+4*2, 0.5, 0.5)
+    spr(piece, x+4*3, y+4*1, 0.5, 0.5)
   end
 end
 
