@@ -2,35 +2,32 @@ pico-8 cartridge // http://www.pico-8.com
 version 43
 __lua__
 function _init()
-	psize_x = 10
-	psize_y = 20
-	
-	pf1 = {}
-	
-	for y=1,20 do
-    pf1[y]={}
-    for x=1,10 do
-      pf1[y][x]=0
-    end
-  end
+  psize_x = 10
+  psize_y = 20
+
+  pf1 = init_playfield()
+  pf2 = init_playfield()
 
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
-  pf1_next = flr(rnd(6)+1)
+  p1 = init_player()
+  p2 = init_player()
 end
 
-function _update()
+function _update60()
+  p1.gravity += 1
+  p2.gravity += 1
 end
 
 function _draw()
-	cls()
-	map(0)
+  cls()
+  map(0)
   render_playfields()
   render_previews()
-  --print(pf1_next, 2, 2)
+  print(p1.gravity, 2, 2)
 end
 
 function render_previews()
-  draw_piece(pf1_next, 24, 12)
+  draw_piece(p1.next, 24, 12)
 end
 
 function render_playfields()
@@ -54,7 +51,7 @@ function render_playfields()
 
 	for x=1,10 do
 		for y=1,20 do
-			spr(pf1[y][x], 68+4*x, 28+4*y, 0.5, 0.5)
+			spr(pf2[y][x], 68+4*x, 28+4*y, 0.5, 0.5)
 		end
 	end
 end
@@ -99,6 +96,40 @@ function draw_piece(piece, x, y)
     spr(piece, x+4*2, y+4*2, 0.5, 0.5)
     spr(piece, x+4*3, y+4*1, 0.5, 0.5)
   end
+end
+
+-->8
+-- physics
+
+function handle_gravity(player)
+end
+
+function next_piece()
+  --needs bag system
+  return flr(rnd(6)+1)
+end
+
+function init_playfield()
+	pf = {}
+
+	for y=1,20 do
+    pf[y]={}
+    for x=1,10 do
+      pf[y][x]=0
+    end
+  end
+
+  return pf
+end
+
+function init_player()
+  return {
+    current = flr(rnd(6)+1),
+    next = flr(rnd(6)+1),
+    row = 5,
+    column = 0,
+    gravity = 0
+  }
 end
 
 __gfx__
