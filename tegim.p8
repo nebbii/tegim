@@ -29,6 +29,7 @@ end
 
 function render_previews()
   draw_piece(p1.next, 24, 12)
+  draw_piece(p2.next, 80, 12)
 end
 
 function render_playfields()
@@ -59,6 +60,7 @@ end
 
 function render_currents()
   draw_piece(p1.current, 12+4*p1.column, 28+4*p1.row)
+  draw_piece(p2.current, 68+4*p2.column, 28+4*p2.row)
 end
 
 -->8
