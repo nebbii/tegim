@@ -25,6 +25,16 @@ function _draw()
   render_previews()
   render_currents()
   print(p1.gravity, 2, 2)
+
+  if p1.gravity > 60 then
+    p1.row += 1
+    p1.gravity = 0
+  end
+
+  if p2.gravity > 60 then
+    p2.row += 1
+    p2.gravity = 0
+  end
 end
 
 function render_previews()
