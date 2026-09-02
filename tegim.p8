@@ -142,12 +142,66 @@ end
 
 function init_player()
   return {
-    current = flr(rnd(6)+1),
     next = flr(rnd(6)+1),
+    current = flr(rnd(6)+1),
     row = 0,
     column = 3,
-    gravity = 0
+    gravity = 0,
+    rotation = 0
   }
+end
+
+function check_grounded(player, playfield)
+  -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
+  piece = player.current
+  x = player.x
+  y = player.y
+
+  if piece == 1 then
+    if playfield[y+1][x] != 0 ||
+       playfield[y+1][x+1] != 0 ||
+       playfield[y+1][x+2] != 0 ||
+       playfield[y+1][x+3] != 0 then
+      return true
+    end
+  elseif piece == 2 then
+    if playfield[y+1][x] != 0 ||
+       playfield[y+2][x+1] != 0 ||
+       playfield[y+2][x+2] != 0 then
+      return true
+    end
+  elseif piece == 3 then
+    if playfield[y+2][x] != 0 ||
+       playfield[y+2][x+1] != 0 ||
+       playfield[y+1][x+2] != 0 then
+      return true
+    end
+  elseif piece == 4 then
+    if playfield[y+1][x] != 0 ||
+       playfield[y+1][x+1] != 0 ||
+       playfield[y+2][x+2] != 0 then
+      return true
+    end
+  elseif piece == 5 then
+    if playfield[y+2][x] != 0 ||
+       playfield[y+1][x+1] != 0 ||
+       playfield[y+1][x+2] != 0 then
+      return true
+    end
+  elseif piece == 6 then
+    if playfield[y+2][x+1] != 0 ||
+       playfield[y+2][x+2] != 0 then
+      return true
+    end
+  elseif piece == 7 then
+    if playfield[y+1][x] != 0 ||
+       playfield[y+2][x+1] != 0 ||
+       playfield[y+1][x+2] != 0 then
+      return true
+    end
+  end
+
+  return false
 end
 
 __gfx__
