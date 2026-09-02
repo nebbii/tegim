@@ -9,13 +9,15 @@ function _init()
   pf2 = init_playfield()
 
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
-  p1 = init_player()
-  p2 = init_player()
+  p1 = init_player(1)
+  p2 = init_player(2)
 end
 
 function _update60()
-  p1.gravity += 1
-  p2.gravity += 1
+  handle_gravity(p1)
+  handle_gravity(p2)
+  handle_input(p1)
+  handle_input(p2)
 end
 
 function _draw()
@@ -25,16 +27,6 @@ function _draw()
   render_previews()
   render_currents()
   print(p1.gravity, 2, 2)
-
-  if p1.gravity > 60 then
-    p1.row += 1
-    p1.gravity = 0
-  end
-
-  if p2.gravity > 60 then
-    p2.row += 1
-    p2.gravity = 0
-  end
 end
 
 function render_previews()
@@ -120,6 +112,11 @@ end
 -- physics
 
 function handle_gravity(player)
+  player.gravity += 1
+  if player.gravity > 60 then
+    player.row += 1
+    player.gravity = 0
+  end
 end
 
 function next_piece()
@@ -128,9 +125,9 @@ function next_piece()
 end
 
 function init_playfield()
-	pf = {}
+  pf = {}
 
-	for y=1,20 do
+  for y=1,20 do
     pf[y]={}
     for x=1,10 do
       pf[y][x]=0
@@ -140,14 +137,28 @@ function init_playfield()
   return pf
 end
 
-function init_player()
+function init_player(player_num)
   return {
+    num = player,
     current = flr(rnd(6)+1),
     next = flr(rnd(6)+1),
     row = 0,
     column = 3,
     gravity = 0
   }
+end
+
+-->8
+-- input
+
+function handle_input(player)
+  if btn(0, player.num) then
+    player.column -= 1
+  end
+
+  if btn(1, player.num) then
+    player.column += 1
+  end
 end
 
 __gfx__
