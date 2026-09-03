@@ -18,11 +18,9 @@ function _init()
   pf1 = init_playfield()
   pf2 = init_playfield()
 
-  pf1[3][10] = 7
-  pf1[4][10] = 7
-  pf1[5][10] = 7
-  pf1[6][10] = 7
-  pf1[7][10] = 7
+  for i=1,10 do
+    pf1[i][18] = 7
+  end
 
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
   p1 = init_player(1)
@@ -78,12 +76,6 @@ function render_playfields()
 	for x=1,10 do
 		for y=1,20 do
 			spr(pf1[x][y], 12+4*x, 28+4*y, 0.5, 0.5)
-      if pf1[x][y] != 0 then
-        print("x", 12+4*x, 28+4*y)
-      else
-        print(".", 12+4*x, 28+4*y)
-      end
-
 		end
 	end
 
@@ -104,6 +96,16 @@ function render_debug()
   print(p1.grounded, 8, 2)
   print(p1.column, 50, 2)
   print(p1.row, 60, 2)
+
+	for x=1,10 do
+		for y=1,20 do
+      if pf1[x][y] != 0 then
+        print("x", 12+4*x, 28+4*y)
+      else
+        print(".", 12+4*x, 28+4*y)
+      end
+		end
+	end
 end
 
 
@@ -134,7 +136,7 @@ function next_piece()
 end
 
 function init_playfield()
-  pf = {}
+  local pf = {}
 
   for column=1,10 do
     pf[column]={}
@@ -161,53 +163,14 @@ end
 
 function check_grounded(player, playfield)
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
-  piece = player.current
-  x = player.column
-  y = player.row
+  local piece = player.current
+  local x = player.column
+  local y = player.row
 
   for brick in all(pieces[piece]) do
-  end
-
-  if piece == 1 then
-    if playfield[x][y+1] != 0 or
-       playfield[x+1][y+1] != 0 or
-       playfield[x+2][y+1] != 0 or
-       playfield[x+3][y+1] != 0 then
-      return true
-    end
-  elseif piece == 2 then
-    if playfield[x][y+1] != 0 or
-       playfield[x+1][y+2] != 0 or
-       playfield[x+2][y+2] != 0 then
-      return true
-    end
-  elseif piece == 3 then
-    if playfield[x+2][y] != 0 or
-       playfield[x+2][y+1] != 0 or
-       playfield[x+1][y+2] != 0 then
-      return true
-    end
-  elseif piece == 4 then
-    if playfield[x+1][y] != 0 or
-       playfield[x+1][y+1] != 0 or
-       playfield[x+2][y+2] != 0 then
-      return true
-    end
-  elseif piece == 5 then
-    if playfield[x+2][y] != 0 or
-       playfield[x+1][y+1] != 0 or
-       playfield[x+1][y+2] != 0 then
-      return true
-    end
-  elseif piece == 6 then
-    if playfield[x+2][y+1] != 0 or
-       playfield[x+2][y+2] != 0 then
-      return true
-    end
-  elseif piece == 7 then
-    if playfield[x+1][y] != 0 or
-       playfield[x+2][y+1] != 0 or
-       playfield[x+1][y+2] != 0 then
+    local bx = x + brick[1]
+    local by = y + brick[2]
+    if playfield[bx][by+1] != 0 then
       return true
     end
   end
