@@ -3,13 +3,48 @@ version 43
 __lua__
 function _init()
   pieces = {
-    {{0,0},{1,0},{2,0},{3,0}}, -- i
-    {{0,0},{1,0},{1,1},{2,1}}, -- z
-    {{0,1},{1,0},{1,1},{2,0}}, -- s
-    {{0,0},{1,0},{2,0},{2,1}}, -- j
-    {{0,0},{0,1},{1,0},{2,0}}, -- l
-    {{0,0},{1,0},{0,1},{1,1}}, -- o
-    {{0,0},{1,0},{1,1},{2,0}}  -- t
+    { -- i
+      {{0,1},{1,1},{2,1},{3,1}},
+      {{2,0},{2,1},{2,2},{2,3}},
+      {{0,1},{1,1},{2,1},{3,1}},
+      {{2,0},{2,1},{2,2},{2,3}}
+    },
+    { -- z
+      {{0,0},{1,0},{1,1},{2,1}},
+      {{0,0},{1,0},{1,1},{2,1}},
+      {{0,0},{1,0},{1,1},{2,1}},
+      {{0,0},{1,0},{1,1},{2,1}}
+    },
+    { -- s
+      {{0,1},{1,0},{1,1},{2,0}},
+      {{0,1},{1,0},{1,1},{2,0}},
+      {{0,1},{1,0},{1,1},{2,0}},
+      {{0,1},{1,0},{1,1},{2,0}}
+    },
+    { -- j
+      {{0,0},{1,0},{2,0},{2,1}},
+      {{0,0},{1,0},{2,0},{2,1}},
+      {{0,0},{1,0},{2,0},{2,1}},
+      {{0,0},{1,0},{2,0},{2,1}}
+    },
+    { -- l
+      {{0,0},{0,1},{1,0},{2,0}},
+      {{0,0},{0,1},{1,0},{2,0}},
+      {{0,0},{0,1},{1,0},{2,0}},
+      {{0,0},{0,1},{1,0},{2,0}}
+    },
+    { -- o
+      {{0,0},{1,0},{0,1},{1,1}},
+      {{0,0},{1,0},{0,1},{1,1}},
+      {{0,0},{1,0},{0,1},{1,1}},
+      {{0,0},{1,0},{0,1},{1,1}}
+    },
+    { -- t
+      {{0,0},{1,0},{1,1},{2,0}},
+      {{0,0},{1,0},{1,1},{2,0}},
+      {{0,0},{1,0},{1,1},{2,0}},
+      {{0,0},{1,0},{1,1},{2,0}}
+    }
   }
 
   psize_x = 10
@@ -59,8 +94,8 @@ function _draw()
 end
 
 function render_previews()
-  draw_piece(p1.next, 30, 16)
-  draw_piece(p2.next, 86, 16)
+  draw_piece(p1.next, 0, 30, 16)
+  draw_piece(p2.next, 0, 86, 16)
 end
 
 function render_playfields()
@@ -90,8 +125,8 @@ function render_playfields()
 end
 
 function render_currents()
-  draw_piece(p1.current, 12+4*p1.column, 28+4*p1.row)
-  draw_piece(p2.current, 68+4*p2.column, 28+4*p2.row)
+  draw_piece(p1.current, p1.rotation, 12+4*p1.column, 28+4*p1.row)
+  draw_piece(p2.current, p2.rotation, 68+4*p2.column, 28+4*p2.row)
 end
 
 function render_debug()
@@ -116,10 +151,12 @@ end
 -->8
 -- pieces
 
-function draw_piece(piece, x, y)
+function draw_piece(piece, rotation, x, y)
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
-  for brick in all(pieces[piece]) do
-    spr(piece, x+brick[1]*4, y+brick[2]*4, 0.5, 0.5)
+  local bricks = pieces[piece][rotation]
+
+  for value in all(bricks) do
+    spr(piece, x+value[1]*4, y+value[2]*4, 0.5, 0.5)
   end
 end
 
@@ -161,20 +198,20 @@ function init_player(num)
     das = 0,
     column = 4,
     gravity = 0,
-    rotation = 0,
+    rotation = 1,
     grounded = false
   }
 end
 
 function check_grounded(player, playfield)
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
-  local piece = player.current
+  local piece = pieces[player.current][player.rotation]
   local x = player.column
   local y = player.row
 
-  for block in all(pieces[piece]) do
-    local bx = x + block[1]
-    local by = y + block[2]
+  for value in all(piece) do
+    local bx = x + value[1]
+    local by = y + value[2]
     if playfield[bx][by+1] != 0 then
       return true
     end
@@ -185,13 +222,13 @@ end
 
 function check_walls(player, playfield, change)
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
-  local piece = player.current
+  local piece = pieces[player.current][player.rotation]
   local x = player.column
   local y = player.row
 
-  for block in all(pieces[piece]) do
-    local bx = x + block[1]
-    local by = y + block[2]
+  for value in all(piece) do
+    local bx = x + value[1]
+    local by = y + value[2]
     if bx+change < 1 or bx+change > 10 then
       return true
     end
