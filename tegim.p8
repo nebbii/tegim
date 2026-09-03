@@ -2,6 +2,16 @@ pico-8 cartridge // http://www.pico-8.com
 version 43
 __lua__
 function _init()
+  pieces = {
+    {{0,0},{1,0},{2,0},{3,0}}, -- i
+    {{0,0},{1,0},{1,1},{2,1}}, -- z
+    {{0,1},{1,0},{1,1},{2,0}}, -- s
+    {{0,0},{1,0},{2,0},{2,1}}, -- j
+    {{0,0},{0,1},{1,0},{2,0}}, -- l
+    {{0,0},{1,0},{0,1},{1,1}}, -- o
+    {{0,0},{1,0},{1,1},{2,0}}  -- t
+  }
+
   psize_x = 10
   psize_y = 20
 
@@ -14,8 +24,16 @@ function _init()
 end
 
 function _update60()
-  handle_gravity(p1)
-  handle_gravity(p2)
+  if check_grounded(p1, pf1) then
+  else
+    handle_gravity(p1)
+  end
+
+  if check_grounded(p2, pf2) then
+  else
+    handle_gravity(p2)
+  end
+
   handle_input(p1)
   handle_input(p2)
 end
@@ -30,8 +48,8 @@ function _draw()
 end
 
 function render_previews()
-  draw_piece(p1.next, 24, 12)
-  draw_piece(p2.next, 80, 12)
+  draw_piece(p1.next, 30, 16)
+  draw_piece(p2.next, 86, 16)
 end
 
 function render_playfields()
@@ -70,41 +88,8 @@ end
 
 function draw_piece(piece, x, y)
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
-  if piece == 1 then
-    spr(piece, x+4*1, y+4*1, 0.5, 0.5)
-    spr(piece, x+4*2, y+4*1, 0.5, 0.5)
-    spr(piece, x+4*3, y+4*1, 0.5, 0.5)
-    spr(piece, x+4*4, y+4*1, 0.5, 0.5)
-  elseif piece == 2 then
-    spr(piece, x+4*1, y+4*1, 0.5, 0.5)
-    spr(piece, x+4*2, y+4*1, 0.5, 0.5)
-    spr(piece, x+4*2, y+4*2, 0.5, 0.5)
-    spr(piece, x+4*3, y+4*2, 0.5, 0.5)
-  elseif piece == 3 then
-    spr(piece, x+4*1, y+4*2, 0.5, 0.5)
-    spr(piece, x+4*2, y+4*1, 0.5, 0.5)
-    spr(piece, x+4*2, y+4*2, 0.5, 0.5)
-    spr(piece, x+4*3, y+4*1, 0.5, 0.5)
-  elseif piece == 4 then
-    spr(piece, x+4*1, y+4*1, 0.5, 0.5)
-    spr(piece, x+4*2, y+4*1, 0.5, 0.5)
-    spr(piece, x+4*3, y+4*1, 0.5, 0.5)
-    spr(piece, x+4*3, y+4*2, 0.5, 0.5)
-  elseif piece == 5 then
-    spr(piece, x+4*1, y+4*1, 0.5, 0.5)
-    spr(piece, x+4*1, y+4*2, 0.5, 0.5)
-    spr(piece, x+4*2, y+4*1, 0.5, 0.5)
-    spr(piece, x+4*3, y+4*1, 0.5, 0.5)
-  elseif piece == 6 then
-    spr(piece, x+4*2, y+4*1, 0.5, 0.5)
-    spr(piece, x+4*3, y+4*1, 0.5, 0.5)
-    spr(piece, x+4*2, y+4*2, 0.5, 0.5)
-    spr(piece, x+4*3, y+4*2, 0.5, 0.5)
-  elseif piece == 7 then
-    spr(piece, x+4*1, y+4*1, 0.5, 0.5)
-    spr(piece, x+4*2, y+4*1, 0.5, 0.5)
-    spr(piece, x+4*2, y+4*2, 0.5, 0.5)
-    spr(piece, x+4*3, y+4*1, 0.5, 0.5)
+  for brick in all(pieces[piece]) do
+    spr(piece, x+brick[1]*4, y+brick[2]*4, 0.5, 0.5)
   end
 end
 
@@ -142,8 +127,8 @@ function init_player(player_num)
     num = player,
     next = flr(rnd(6)+1),
     current = flr(rnd(6)+1),
-    row = 0,
-    column = 3,
+    row = 1,
+    column = 4,
     gravity = 0,
     rotation = 0
   }
@@ -152,49 +137,49 @@ end
 function check_grounded(player, playfield)
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
   piece = player.current
-  x = player.x
-  y = player.y
+  x = player.column
+  y = player.row
 
   if piece == 1 then
-    if playfield[y+1][x] != 0 or
-       playfield[y+1][x+1] != 0 or
-       playfield[y+1][x+2] != 0 or
-       playfield[y+1][x+3] != 0 then
+    if playfield[x+1][y] != 0 or
+       playfield[x+1][y+1] != 0 or
+       playfield[x+1][y+2] != 0 or
+       playfield[x+1][y+3] != 0 then
       return true
     end
   elseif piece == 2 then
-    if playfield[y+1][x] != 0 or
-       playfield[y+2][x+1] != 0 or
-       playfield[y+2][x+2] != 0 then
+    if playfield[x+1][y] != 0 or
+       playfield[x+2][y+1] != 0 or
+       playfield[x+2][y+2] != 0 then
       return true
     end
   elseif piece == 3 then
-    if playfield[y+2][x] != 0 or
-       playfield[y+2][x+1] != 0 or
-       playfield[y+1][x+2] != 0 then
+    if playfield[x+2][y] != 0 or
+       playfield[x+2][y+1] != 0 or
+       playfield[x+1][y+2] != 0 then
       return true
     end
   elseif piece == 4 then
-    if playfield[y+1][x] != 0 or
-       playfield[y+1][x+1] != 0 or
-       playfield[y+2][x+2] != 0 then
+    if playfield[x+1][y] != 0 or
+       playfield[x+1][y+1] != 0 or
+       playfield[x+2][y+2] != 0 then
       return true
     end
   elseif piece == 5 then
-    if playfield[y+2][x] != 0 or
-       playfield[y+1][x+1] != 0 or
-       playfield[y+1][x+2] != 0 then
+    if playfield[x+2][y] != 0 or
+       playfield[x+1][y+1] != 0 or
+       playfield[x+1][y+2] != 0 then
       return true
     end
   elseif piece == 6 then
-    if playfield[y+2][x+1] != 0 or
-       playfield[y+2][x+2] != 0 then
+    if playfield[x+2][y+1] != 0 or
+       playfield[x+2][y+2] != 0 then
       return true
     end
   elseif piece == 7 then
-    if playfield[y+1][x] != 0 or
-       playfield[y+2][x+1] != 0 or
-       playfield[y+1][x+2] != 0 then
+    if playfield[x+1][y] != 0 or
+       playfield[x+2][y+1] != 0 or
+       playfield[x+1][y+2] != 0 then
       return true
     end
   end
