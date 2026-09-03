@@ -21,6 +21,9 @@ function _init()
   for i=1,10 do
     pf1[i][18] = 7
   end
+  for i=3,8 do
+    pf1[i][12] = 7
+  end
 
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
   p1 = init_player(0)
@@ -180,13 +183,38 @@ function check_grounded(player, playfield)
   return false
 end
 
-function move_piece(player, playfield, direction)
-  if direction == 0 and player.column > 1 then
-    player.column -= 1
+function check_walls(player, playfield, change)
+  -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
+  local piece = player.current
+  local x = player.column
+  local y = player.row
+
+  for block in all(pieces[piece]) do
+    local bx = x + block[1]
+    local by = y + block[2]
+    if bx+change < 1 or bx+change > 10 then
+      return true
+    end
+
+    if playfield[bx+change][by] != 0 then
+      return true
+    end
   end
 
-  if direction == 1 and player.column < 7 then
-    player.column += 1
+  return false
+end
+
+function move_piece(player, playfield, direction)
+  if direction == 0 then
+    if not check_walls(player, playfield, -1) then
+      player.column -= 1
+    end
+  end
+
+  if direction == 1 then
+    if not check_walls(player, playfield, 1) then
+      player.column += 1
+    end
   end
 end
 
