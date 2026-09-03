@@ -23,8 +23,8 @@ function _init()
   end
 
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
-  p1 = init_player(1)
-  p2 = init_player(2)
+  p1 = init_player(0)
+  p2 = init_player(1)
 end
 
 function _update60()
@@ -52,7 +52,7 @@ function _draw()
   render_playfields()
   render_previews()
   render_currents()
-  --render_debug()
+  render_debug()
 end
 
 function render_previews()
@@ -93,9 +93,10 @@ end
 
 function render_debug()
   print(p1.gravity, 2, 2)
-  print(p1.grounded, 8, 2)
-  print(p1.column, 50, 2)
-  print(p1.row, 60, 2)
+  --print(p1.grounded, 8, 2)
+  --print(p1.column, 50, 2)
+  --print(p1.row, 60, 2)
+  print(p1.das, 40, 2)
 
 	for x=1,10 do
 		for y=1,20 do
@@ -148,12 +149,13 @@ function init_playfield()
   return pf
 end
 
-function init_player(player_num)
+function init_player(num)
   return {
-    num = player,
+    num = num,
     next = flr(rnd(6)+1),
     current = flr(rnd(6)+1),
     row = 1,
+    das = 0,
     column = 4,
     gravity = 0,
     rotation = 0,
@@ -167,9 +169,9 @@ function check_grounded(player, playfield)
   local x = player.column
   local y = player.row
 
-  for brick in all(pieces[piece]) do
-    local bx = x + brick[1]
-    local by = y + brick[2]
+  for block in all(pieces[piece]) do
+    local bx = x + block[1]
+    local by = y + block[2]
     if playfield[bx][by+1] != 0 then
       return true
     end
@@ -178,16 +180,53 @@ function check_grounded(player, playfield)
   return false
 end
 
+function move_piece(player, playfield, direction)
+  if direction == 0 and player.column > 1 then
+    player.column -= 1
+  end
+
+  if direction == 1 and player.column < 7 then
+    player.column += 1
+  end
+end
+
+
 -->8
 -- input
 
 function handle_input(player)
-  if btn(0, player.num) then
-    player.column -= 1
+  local left = btn(0, player.num)
+  local right = btn(1, player.num)
+
+  if left and right then
+    player.das = 0
+    return
   end
 
-  if btn(1, player.num) then
-    player.column += 1
+  if left then
+    if player.das == 0 then
+      move_piece(p1, pf1, 0)
+    elseif player.das <= -16 then
+      move_piece(p1, pf1, 0)
+    elseif player.das > 0 then
+      move_piece(p1, pf1, 0)
+      player.das = 0
+    end
+
+    player.das -= 1
+  elseif right then
+    if player.das == 0 then
+      move_piece(p1, pf1, 1)
+    elseif player.das >= 16 then
+      move_piece(p1, pf1, 1)
+    elseif player.das < 0 then
+      move_piece(p1, pf1, 1)
+      player.das = 0
+    end
+
+    player.das += 1
+  else
+    player.das = 0
   end
 end
 
