@@ -18,6 +18,12 @@ function _init()
   pf1 = init_playfield()
   pf2 = init_playfield()
 
+  pf1[3][10] = 7
+  pf1[4][10] = 7
+  pf1[5][10] = 7
+  pf1[6][10] = 7
+  pf1[7][10] = 7
+
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
   p1 = init_player(1)
   p2 = init_player(2)
@@ -25,12 +31,16 @@ end
 
 function _update60()
   if check_grounded(p1, pf1) then
+    p1.grounded = true
   else
+    p1.grounded = false
     handle_gravity(p1)
   end
 
   if check_grounded(p2, pf2) then
+    p2.grounded = true
   else
+    p2.grounded = false
     handle_gravity(p2)
   end
 
@@ -44,7 +54,7 @@ function _draw()
   render_playfields()
   render_previews()
   render_currents()
-  print(p1.gravity, 2, 2)
+  --render_debug()
 end
 
 function render_previews()
@@ -67,13 +77,19 @@ function render_playfields()
 
 	for x=1,10 do
 		for y=1,20 do
-			spr(pf1[y][x], 12+4*x, 28+4*y, 0.5, 0.5)
+			spr(pf1[x][y], 12+4*x, 28+4*y, 0.5, 0.5)
+      if pf1[x][y] != 0 then
+        print("x", 12+4*x, 28+4*y)
+      else
+        print(".", 12+4*x, 28+4*y)
+      end
+
 		end
 	end
 
 	for x=1,10 do
 		for y=1,20 do
-			spr(pf2[y][x], 68+4*x, 28+4*y, 0.5, 0.5)
+			spr(pf2[x][y], 68+4*x, 28+4*y, 0.5, 0.5)
 		end
 	end
 end
@@ -82,6 +98,14 @@ function render_currents()
   draw_piece(p1.current, 12+4*p1.column, 28+4*p1.row)
   draw_piece(p2.current, 68+4*p2.column, 28+4*p2.row)
 end
+
+function render_debug()
+  print(p1.gravity, 2, 2)
+  print(p1.grounded, 8, 2)
+  print(p1.column, 50, 2)
+  print(p1.row, 60, 2)
+end
+
 
 -->8
 -- pieces
@@ -98,7 +122,7 @@ end
 
 function handle_gravity(player)
   player.gravity += 1
-  if player.gravity > 60 then
+  if player.gravity > 10 then
     player.row += 1
     player.gravity = 0
   end
@@ -112,10 +136,10 @@ end
 function init_playfield()
   pf = {}
 
-  for y=1,20 do
-    pf[y]={}
-    for x=1,10 do
-      pf[y][x]=0
+  for column=1,10 do
+    pf[column]={}
+    for row=1,20 do
+      pf[column][row]=0
     end
   end
 
@@ -130,7 +154,8 @@ function init_player(player_num)
     row = 1,
     column = 4,
     gravity = 0,
-    rotation = 0
+    rotation = 0,
+    grounded = false
   }
 end
 
@@ -140,16 +165,19 @@ function check_grounded(player, playfield)
   x = player.column
   y = player.row
 
+  for brick in all(pieces[piece]) do
+  end
+
   if piece == 1 then
-    if playfield[x+1][y] != 0 or
+    if playfield[x][y+1] != 0 or
        playfield[x+1][y+1] != 0 or
-       playfield[x+1][y+2] != 0 or
-       playfield[x+1][y+3] != 0 then
+       playfield[x+2][y+1] != 0 or
+       playfield[x+3][y+1] != 0 then
       return true
     end
   elseif piece == 2 then
-    if playfield[x+1][y] != 0 or
-       playfield[x+2][y+1] != 0 or
+    if playfield[x][y+1] != 0 or
+       playfield[x+1][y+2] != 0 or
        playfield[x+2][y+2] != 0 then
       return true
     end
