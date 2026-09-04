@@ -11,27 +11,27 @@ function _init()
     },
     { -- z
       {{0,0},{1,0},{1,1},{2,1}},
+      {{2,0},{1,1},{2,1},{1,2}},
       {{0,0},{1,0},{1,1},{2,1}},
-      {{0,0},{1,0},{1,1},{2,1}},
-      {{0,0},{1,0},{1,1},{2,1}}
+      {{2,0},{1,1},{2,1},{1,2}}
     },
     { -- s
-      {{0,1},{1,0},{1,1},{2,0}},
-      {{0,1},{1,0},{1,1},{2,0}},
-      {{0,1},{1,0},{1,1},{2,0}},
-      {{0,1},{1,0},{1,1},{2,0}}
+      {{0,2},{1,1},{1,2},{2,1}},
+      {{0,0},{0,1},{1,1},{1,2}},
+      {{0,2},{1,1},{1,2},{2,1}},
+      {{0,0},{0,1},{1,1},{1,2}},
     },
     { -- j
-      {{0,0},{1,0},{2,0},{2,1}},
-      {{0,0},{1,0},{2,0},{2,1}},
-      {{0,0},{1,0},{2,0},{2,1}},
-      {{0,0},{1,0},{2,0},{2,1}}
+      {{0,1},{1,1},{2,1},{2,2}},
+      {{1,0},{1,1},{0,2},{1,2}},
+      {{0,1},{0,2},{1,2},{2,2}},
+      {{1,0},{2,0},{1,1},{1,2}}
     },
     { -- l
-      {{0,0},{0,1},{1,0},{2,0}},
-      {{0,0},{0,1},{1,0},{2,0}},
-      {{0,0},{0,1},{1,0},{2,0}},
-      {{0,0},{0,1},{1,0},{2,0}}
+      {{0,1},{0,2},{1,1},{2,1}},
+      {{0,0},{0,1},{1,2},{1,3}},
+      {{0,2},{1,2},{2,1},{2,2}},
+      {{1,0},{1,1},{1,2},{2,2}}
     },
     { -- o
       {{0,0},{1,0},{0,1},{1,1}},
@@ -40,10 +40,10 @@ function _init()
       {{0,0},{1,0},{0,1},{1,1}}
     },
     { -- t
-      {{0,0},{1,0},{1,1},{2,0}},
-      {{0,0},{1,0},{1,1},{2,0}},
-      {{0,0},{1,0},{1,1},{2,0}},
-      {{0,0},{1,0},{1,1},{2,0}}
+      {{0,1},{1,1},{1,2},{2,1}},
+      {{1,0},{0,1},{1,1},{1,2}},
+      {{0,2},{1,1},{1,2},{2,2}},
+      {{1,0},{1,1},{2,1},{1,2}}
     }
   }
 
@@ -132,9 +132,9 @@ end
 function render_debug()
   print(p1.gravity, 2, 2)
   --print(p1.grounded, 8, 2)
-  --print(p1.column, 50, 2)
-  --print(p1.row, 60, 2)
   print(p1.das, 40, 2)
+  print(p1.lspin, 50, 2)
+  print(p1.rspin, 60, 2)
 
 	for x=1,10 do
 		for y=1,20 do
@@ -155,8 +155,8 @@ function draw_piece(piece, rotation, x, y)
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
   local bricks = pieces[piece][rotation]
 
-  for value in all(bricks) do
-    spr(piece, x+value[1]*4, y+value[2]*4, 0.5, 0.5)
+  for block in all(bricks) do
+    spr(piece, x+block[1]*4, y+block[2]*4, 0.5, 0.5)
   end
 end
 
@@ -165,7 +165,7 @@ end
 
 function handle_gravity(player)
   player.gravity += 1
-  if player.gravity > 10 then
+  if player.gravity > 100 then
     player.row += 1
     player.gravity = 0
   end
@@ -173,7 +173,7 @@ end
 
 function next_piece()
   --needs bag system
-  return flr(rnd(6)+1)
+  return flr(rnd(7)+1)
 end
 
 function init_playfield()
@@ -192,13 +192,15 @@ end
 function init_player(num)
   return {
     num = num,
-    next = flr(rnd(6)+1),
-    current = flr(rnd(6)+1),
+    next = flr(rnd(7)+1),
+    current = 7,
     row = 1,
     das = 0,
     column = 4,
     gravity = 0,
     rotation = 1,
+    lspin = 0,
+    rspin = 0,
     grounded = false
   }
 end
@@ -209,9 +211,9 @@ function check_grounded(player, playfield)
   local x = player.column
   local y = player.row
 
-  for value in all(piece) do
-    local bx = x + value[1]
-    local by = y + value[2]
+  for block in all(piece) do
+    local bx = x + block[1]
+    local by = y + block[2]
     if playfield[bx][by+1] != 0 then
       return true
     end
@@ -220,20 +222,20 @@ function check_grounded(player, playfield)
   return false
 end
 
-function check_walls(player, playfield, change)
+function check_walls(player, playfield, move)
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
   local piece = pieces[player.current][player.rotation]
   local x = player.column
   local y = player.row
 
-  for value in all(piece) do
-    local bx = x + value[1]
-    local by = y + value[2]
-    if bx+change < 1 or bx+change > 10 then
+  for block in all(piece) do
+    local bx = x + block[1]
+    local by = y + block[2]
+    if bx+move < 1 or bx+move > 10 then
       return true
     end
 
-    if playfield[bx+change][by] != 0 then
+    if playfield[bx+move][by] != 0 then
       return true
     end
   end
@@ -255,20 +257,41 @@ function move_piece(player, playfield, direction)
   end
 end
 
+function spin_piece(player, playfield, direction)
+  if direction == 0 then
+    player.rotation -= 1
+    if check_walls(player, playfield, -1) then
+      player.rotation += 1
+    end
+  end
+
+  if direction == 1 then
+    player.rotation += 1
+    if check_walls(player, playfield, 1) then
+      player.rotation -= 1
+    end
+  end
+
+  if player.rotation < 1 then
+    player.rotation = 4
+  end
+
+  if player.rotation > 4 then
+    player.rotation = 1
+  end
+end
 
 -->8
 -- input
 
 function handle_input(player)
+  -- movement
   local left = btn(0, player.num)
   local right = btn(1, player.num)
 
   if left and right then
     player.das = 0
-    return
-  end
-
-  if left then
+  elseif left then
     if player.das == 0 then
       move_piece(p1, pf1, 0)
     elseif player.das <= -16 then
@@ -292,6 +315,32 @@ function handle_input(player)
     player.das += 1
   else
     player.das = 0
+  end
+
+  -- rotation
+  local o = btn(4, player.num)
+  local x = btn(5, player.num)
+  --local up = btn(2, player.num)
+
+  -- IRS always prioritizes A over B
+  if o then
+    if player.lspin == 0 then
+      spin_piece(p1, pf1, 0)
+    end
+
+    player.lspin = 1
+  else
+    player.lspin = 0
+  end
+
+  if x then
+    if player.rspin == 0 then
+      spin_piece(p1, pf1, 1)
+    end
+
+    player.rspin = 1
+  else
+    player.rspin = 0
   end
 end
 
