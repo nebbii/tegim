@@ -29,7 +29,7 @@ function _init()
     },
     { -- l
       {{0,1},{0,2},{1,1},{2,1}},
-      {{0,0},{0,1},{1,2},{1,3}},
+      {{0,0},{1,0},{1,1},{1,2}},
       {{0,2},{1,2},{2,1},{2,2}},
       {{1,0},{1,1},{1,2},{2,2}}
     },
@@ -53,30 +53,10 @@ function _init()
   pf1 = init_playfield()
   pf2 = init_playfield()
 
-  pf1[9][3] = 7
-  pf1[10][3] = 7
-
-  pf1[7][6] = 7
-  pf1[8][6] = 7
-  pf1[9][6] = 7
-  pf1[10][6] = 7
-
-  pf1[4][10] = 7
-  pf1[6][10] = 7
-  pf1[8][10] = 7
-  pf1[10][10] = 7
-
-  for i=1,10 do
-    pf1[i][18] = 7
-  end
-  for i=2,9 do
-    pf1[i][13] = 7
-  end
-
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
   p1 = init_player(0)
   p2 = init_player(1)
-  music(0)
+  --music(0)
 end
 
 function _update60()
@@ -207,7 +187,7 @@ function init_player(num)
   return {
     num = num,
     next = flr(rnd(7)+1),
-    current = 4,
+    current = flr(rnd(7)+1),
     row = 1,
     das = 0,
     column = 4,
@@ -335,15 +315,43 @@ function check_kicks(player, playfield, direction)
     end
   elseif player.current == 4 then -- j
     if is_any_tile_taken(player, playfield) then
-      if try_regular_kick(player, playfield) then
-        return true
+      if center_column_rule(player, playfield) then
+        if try_regular_kick(player, playfield) then
+          return true
+        else
+          return false
+        end
       else
         return false
       end
     end
   elseif player.current == 5 then -- l
+    if is_any_tile_taken(player, playfield) then
+      if center_column_rule(player, playfield) then
+        if try_regular_kick(player, playfield) then
+          printh('regular kick passed')
+          return true
+        else
+          return false
+        end
+      else
+        return false
+      end
+    end
   elseif player.current == 6 then -- o
+    -- :thinking:
   elseif player.current == 7 then -- t
+    if is_any_tile_taken(player, playfield) then
+      if center_column_rule(player, playfield) then
+        if try_regular_kick(player, playfield) then
+          return true
+        else
+          return false
+        end
+      else
+        return false
+      end
+    end
   end
 
   return true
@@ -369,15 +377,17 @@ function try_regular_kick(player, playfield)
   return false
 end
 
-function center_column_kick(player, playfield, center)
-  for x=-1,1 do
-    for y=-1,1 do
-      local bx = center[1] + player.column + x
-      local by = center[2] + player.row + y
+function center_column_rule(player, playfield, center)
+  for x=0,2 do
+    for y=0,2 do
+      local bx = player.column + x
+      local by = player.row + y
 
-      if is_tile_taken(playfield, x, y) and not x == 0 then
+      if is_tile_taken(playfield, bx, by) and not x == 1 then
+        printh('center column rule: passed on ' .. x .. ', ' .. y)
         return true
-      elseif is_tile_taken(playfield, x, y) and x == 0 then
+      elseif is_tile_taken(playfield, bx, by) and x == 1 then
+        printh('center column rule: rejected on ' .. x .. ', ' .. y)
         return false
       end
     end
