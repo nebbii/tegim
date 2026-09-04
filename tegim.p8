@@ -165,7 +165,7 @@ end
 
 function handle_gravity(player)
   player.gravity += 1
-  if player.gravity > 100 then
+  if player.gravity > 60 then
     player.row += 1
     player.gravity = 0
   end
@@ -193,7 +193,7 @@ function init_player(num)
   return {
     num = num,
     next = flr(rnd(7)+1),
-    current = 1,
+    current = 2,
     row = 1,
     das = 0,
     column = 4,
@@ -298,19 +298,25 @@ function check_kicks(player, playfield, direction)
   local y = player.row
 
   if player.current == 1 then -- i
-    for block in all(piece) do
-      local bx = x + block[1]
-      local by = y + block[2]
-
-      if playfield[bx] == nil or playfield[bx][by] == nil then
-        return false
-      end
-
-      if playfield[bx][by] != 0 then
-        return false
-      end
+    if is_any_tile_taken(player, playfield) then
+      return false
     end
   elseif player.current == 2 then -- z
+    if is_any_tile_taken(player, playfield) then
+      if center_column_kick(player, playfield, piece[3]) then
+        player.column += 1
+
+        if is_any_tile_taken(player, playfield) then
+          player.column -= 1
+        end
+
+        player.column -= 1
+
+        if is_any_tile_taken(player, playfield) then
+          player.column += 1
+        end
+      end
+    end
   elseif player.current == 3 then -- s
   elseif player.current == 4 then -- j
   elseif player.current == 5 then -- l
@@ -321,8 +327,48 @@ function check_kicks(player, playfield, direction)
   return true
 end
 
-function check_center_column(player, playfield, center)
+function center_column_kick(player, playfield, center)
+  for x=-1,1 do
+    for y=-1,1 do
+      local bx = center[1] + player.column + x
+      local by = center[2] + player.row + y
+
+      if is_tile_taken(playfield, x, y) and not (x == 2 or x == 5 or x == 8) then
+        return true
+      elseif is_tile_taken(playfield, x, y) and (x == 2 or x == 5 or x == 8) then
+        return false
+      end
+    end
+  end
+
+  return true
 end
+
+function is_tile_taken(playfield, x, y)
+  if playfield[x] == nil or playfield[x][y] == nil then
+    return true
+  elseif playfield[x][y] != 0 then
+    return true
+  end
+
+  return false
+end
+
+function is_any_tile_taken(player, playfield)
+  local piece = pieces[player.current][player.rotation]
+  local x = player.column
+  local y = player.row
+
+  for block in all(piece) do
+    local bx = x + block[1]
+    local by = y + block[2]
+
+    if is_tile_taken(playfield, bx, by) then return true end
+  end
+
+  return false
+end
+
 
 -->8
 -- input
