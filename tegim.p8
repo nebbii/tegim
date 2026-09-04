@@ -56,7 +56,7 @@ function _init()
   for i=1,10 do
     pf1[i][18] = 7
   end
-  for i=3,8 do
+  for i=4,7 do
     pf1[i][12] = 7
   end
 
@@ -66,6 +66,9 @@ function _init()
 end
 
 function _update60()
+  handle_input(p1)
+  handle_input(p2)
+
   if check_grounded(p1, pf1) then
     p1.grounded = true
   else
@@ -79,9 +82,6 @@ function _update60()
     p2.grounded = false
     handle_gravity(p2)
   end
-
-  handle_input(p1)
-  handle_input(p2)
 end
 
 function _draw()
@@ -193,7 +193,7 @@ function init_player(num)
   return {
     num = num,
     next = flr(rnd(7)+1),
-    current = 7,
+    current = 1,
     row = 1,
     das = 0,
     column = 4,
@@ -214,6 +214,7 @@ function check_grounded(player, playfield)
   for block in all(piece) do
     local bx = x + block[1]
     local by = y + block[2]
+
     if playfield[bx][by+1] != 0 then
       return true
     end
@@ -260,14 +261,14 @@ end
 function spin_piece(player, playfield, direction)
   if direction == 0 then
     player.rotation -= 1
-    if check_walls(player, playfield, -1) then
+    if not check_kicks(player, playfield, -1) then
       player.rotation += 1
     end
   end
 
   if direction == 1 then
     player.rotation += 1
-    if check_walls(player, playfield, 1) then
+    if not check_kicks(player, playfield, 1) then
       player.rotation -= 1
     end
   end
@@ -279,6 +280,33 @@ function spin_piece(player, playfield, direction)
   if player.rotation > 4 then
     player.rotation = 1
   end
+end
+
+function check_kicks(player, playfield, direction)
+  local piece = pieces[player.current][player.rotation]
+  local x = player.column
+  local y = player.row
+  if player.current == 1 then -- i
+    for block in all(piece) do
+      local bx = x + block[1]
+      local by = y + block[2]
+
+      if playfield[bx] == nil or playfield[bx][by] == nil then
+        return false
+      end
+    end
+  elseif player.current == 2 then -- z
+  elseif player.current == 3 then -- s
+  elseif player.current == 4 then -- j
+  elseif player.current == 5 then -- l
+  elseif player.current == 6 then -- o
+  elseif player.current == 7 then -- t
+  end
+
+  return true
+end
+
+function check_center_column(player, playfield, block)
 end
 
 -->8
@@ -320,7 +348,7 @@ function handle_input(player)
   -- rotation
   local o = btn(4, player.num)
   local x = btn(5, player.num)
-  --local up = btn(2, player.num)
+--local up = btn(2, player.num)
 
   -- IRS always prioritizes A over B
   if o then
