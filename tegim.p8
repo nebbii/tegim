@@ -10,10 +10,10 @@ function _init()
       {{2,0},{2,1},{2,2},{2,3}}
     },
     { -- z
-      {{0,0},{1,0},{1,1},{2,1}},
-      {{2,0},{1,1},{2,1},{1,2}},
-      {{0,0},{1,0},{1,1},{2,1}},
-      {{2,0},{1,1},{2,1},{1,2}}
+      {{0,1},{1,2},{1,1},{2,2}},
+      {{2,0},{2,1},{1,1},{1,2}},
+      {{0,1},{1,2},{1,1},{2,2}},
+      {{2,0},{2,1},{1,1},{1,2}}
     },
     { -- s
       {{0,2},{1,1},{1,2},{2,1}},
@@ -53,11 +53,24 @@ function _init()
   pf1 = init_playfield()
   pf2 = init_playfield()
 
+  pf1[9][3] = 7
+  pf1[10][3] = 7
+
+  pf1[7][6] = 7
+  pf1[8][6] = 7
+  pf1[9][6] = 7
+  pf1[10][6] = 7
+
+  pf1[4][10] = 7
+  pf1[6][10] = 7
+  pf1[8][10] = 7
+  pf1[10][10] = 7
+
   for i=1,10 do
     pf1[i][18] = 7
   end
-  for i=4,7 do
-    pf1[i][12] = 7
+  for i=2,9 do
+    pf1[i][13] = 7
   end
 
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
@@ -90,7 +103,7 @@ function _draw()
   render_playfields()
   render_previews()
   render_currents()
-  render_debug()
+  --render_debug()
 end
 
 function render_previews()
@@ -165,7 +178,7 @@ end
 
 function handle_gravity(player)
   player.gravity += 1
-  if player.gravity > 60 then
+  if player.gravity > 20 then
     player.row += 1
     player.gravity = 0
   end
@@ -292,6 +305,8 @@ function increase_rotation(player)
   end
 end
 
+-- returns true upon no rules broken
+--  or a successful kick
 function check_kicks(player, playfield, direction)
   local piece = pieces[player.current][player.rotation]
   local x = player.column
@@ -302,6 +317,27 @@ function check_kicks(player, playfield, direction)
       return false
     end
   elseif player.current == 2 then -- z
+    if is_any_tile_taken(player, playfield) then
+      player.column += 1
+
+      if is_any_tile_taken(player, playfield) then
+        player.column -= 1
+      else
+        return true
+      end
+
+      player.column -= 1
+
+      if is_any_tile_taken(player, playfield) then
+        player.column += 1
+      else
+        return true
+      end
+
+      return false
+    end
+  elseif player.current == 3 then -- s
+  elseif player.current == 4 then -- j
     if is_any_tile_taken(player, playfield) then
       if center_column_kick(player, playfield, piece[3]) then
         player.column += 1
@@ -317,8 +353,6 @@ function check_kicks(player, playfield, direction)
         end
       end
     end
-  elseif player.current == 3 then -- s
-  elseif player.current == 4 then -- j
   elseif player.current == 5 then -- l
   elseif player.current == 6 then -- o
   elseif player.current == 7 then -- t
