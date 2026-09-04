@@ -260,22 +260,32 @@ end
 
 function spin_piece(player, playfield, direction)
   if direction == 0 then
-    player.rotation -= 1
+    decrease_rotation(player)
+
     if not check_kicks(player, playfield, -1) then
-      player.rotation += 1
+      increase_rotation(player)
     end
   end
 
   if direction == 1 then
-    player.rotation += 1
+    increase_rotation(player)
+
     if not check_kicks(player, playfield, 1) then
-      player.rotation -= 1
+      decrease_rotation(player)
     end
   end
+end
+
+function decrease_rotation(player)
+  player.rotation -= 1
 
   if player.rotation < 1 then
     player.rotation = 4
   end
+end
+
+function increase_rotation(player)
+  player.rotation += 1
 
   if player.rotation > 4 then
     player.rotation = 1
@@ -286,12 +296,17 @@ function check_kicks(player, playfield, direction)
   local piece = pieces[player.current][player.rotation]
   local x = player.column
   local y = player.row
+
   if player.current == 1 then -- i
     for block in all(piece) do
       local bx = x + block[1]
       local by = y + block[2]
 
       if playfield[bx] == nil or playfield[bx][by] == nil then
+        return false
+      end
+
+      if playfield[bx][by] != 0 then
         return false
       end
     end
@@ -306,7 +321,7 @@ function check_kicks(player, playfield, direction)
   return true
 end
 
-function check_center_column(player, playfield, block)
+function check_center_column(player, playfield, center)
 end
 
 -->8
