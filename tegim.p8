@@ -206,7 +206,7 @@ function init_player(num)
   return {
     num = num,
     next = flr(rnd(7)+1),
-    current = 2,
+    current = 3,
     row = 1,
     das = 0,
     column = 4,
@@ -318,25 +318,20 @@ function check_kicks(player, playfield, direction)
     end
   elseif player.current == 2 then -- z
     if is_any_tile_taken(player, playfield) then
-      player.column += 1
-
-      if is_any_tile_taken(player, playfield) then
-        player.column -= 1
-      else
+      if try_regular_kick(player, playfield) then
         return true
-      end
-
-      player.column -= 1
-
-      if is_any_tile_taken(player, playfield) then
-        player.column += 1
       else
-        return true
+        return false
       end
-
-      return false
     end
   elseif player.current == 3 then -- s
+    if is_any_tile_taken(player, playfield) then
+      if try_regular_kick(player, playfield) then
+        return true
+      else
+        return false
+      end
+    end
   elseif player.current == 4 then -- j
     if is_any_tile_taken(player, playfield) then
       if center_column_kick(player, playfield, piece[3]) then
@@ -359,6 +354,26 @@ function check_kicks(player, playfield, direction)
   end
 
   return true
+end
+
+function try_regular_kick(player, playfield)
+  player.column += 1
+
+  if is_any_tile_taken(player, playfield) then
+    player.column -= 1
+  else
+    return true
+  end
+
+  player.column -= 1
+
+  if is_any_tile_taken(player, playfield) then
+    player.column += 1
+  else
+    return true
+  end
+
+  return false
 end
 
 function center_column_kick(player, playfield, center)
