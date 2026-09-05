@@ -79,7 +79,7 @@ function _init()
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
   p1 = init_player(0)
   p2 = init_player(1)
-  --music(0)
+  music(0)
 end
 
 function _update60()
@@ -114,7 +114,7 @@ function _draw()
   render_status()
   render_previews()
   render_currents()
-  render_debug()
+  --render_debug()
 end
 
 -->8
@@ -383,7 +383,7 @@ function init_player(num)
     current = flr(rnd(7)+1),
     column = 4,
     row = 1,
-    level = 70,
+    level = 1,
     gravity = 0,
 
     -- delays
