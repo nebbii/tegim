@@ -84,8 +84,13 @@ function _update60()
   handle_input(p1)
   handle_input(p2)
 
-  handle_gravity(p1, pf1)
-  handle_gravity(p2, pf2)
+  if p1.alive then
+    handle_gravity(p1, pf1)
+  end
+
+  if p2.alive then
+    handle_gravity(p2, pf2)
+  end
 end
 
 function _draw()
@@ -262,12 +267,29 @@ function get_level_gravity(level)
   return 5120
 end
 
-function next_piece()
+function next_piece(player, playfield)
   --needs bag system
-  return flr(rnd(7)+1)
+  -- grabs piece shown in preview
+  player.current = player.next
+  player.next = flr(rnd(7)+1)
+  player.rotation = 1
+  player.column = 4
+  player.row = 1
+  player.level += 1
+
+  if is_any_tile_taken(player, playfield) then
+    player.alive = false
+  end
 end
 
-function place_piece()
+function place_piece(player, playfield)
+  local piece = pieces[player.current][player.rotation]
+
+  for block in all(piece) do
+    playfield[player.column + block[1]][player.row + block[2]] = player.current
+  end
+
+  next_piece(player, playfield)
 end
 
 function init_playfield()
@@ -302,6 +324,8 @@ function init_player(num)
     lspin = 0,
     l2spin = 0,
     rspin = 0,
+
+    alive = true,
   }
 end
 
