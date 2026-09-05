@@ -53,26 +53,25 @@ function _init()
   pf1 = init_playfield()
   pf2 = init_playfield()
 
---pf1[9][3] = 7
---pf1[10][3] = 7
+  --pf1[9][3] = 7
+  --pf1[10][3] = 7
 
---pf1[7][6] = 7
---pf1[8][6] = 7
---pf1[9][6] = 7
---pf1[10][6] = 7
+  --pf1[7][6] = 7
+  --pf1[8][6] = 7
+  --pf1[9][6] = 7
+  --pf1[10][6] = 7
 
---pf1[4][10] = 7
---pf1[6][10] = 7
---pf1[8][10] = 7
---pf1[10][10] = 7
+  --pf1[4][10] = 7
+  --pf1[6][10] = 7
+  --pf1[8][10] = 7
+  --pf1[10][10] = 7
 
---for i=1,10 do
---  pf1[i][18] = 7
---end
---for i=2,9 do
---  pf1[i][13] = 7
---end
-
+  --for i=1,10 do
+  --  pf1[i][18] = 7
+  --end
+  --for i=2,9 do
+  --  pf1[i][13] = 7
+  --end
 
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
   p1 = init_player(0)
@@ -84,82 +83,80 @@ function _update60()
   handle_input(p1)
   handle_input(p2)
 
-  if check_grounded(p1, pf1) then
-    p1.grounded = true
-  else
-    p1.grounded = false
-    handle_gravity(p1)
-  end
-
-  if check_grounded(p2, pf2) then
-    p2.grounded = true
-  else
-    p2.grounded = false
-    handle_gravity(p2)
-  end
+  handle_gravity(p1, pf1)
+  handle_gravity(p2, pf2)
 end
 
 function _draw()
   cls()
   map(0)
   render_playfields()
+  render_status()
   render_previews()
   render_currents()
-  --render_debug()
+  render_debug()
 end
 
 function render_previews()
-  draw_piece(p1.next, 0, 30, 16)
-  draw_piece(p2.next, 0, 86, 16)
+  draw_piece(p1.next, 1, 24, 16)
+  draw_piece(p2.next, 1, 94, 16)
 end
 
 function render_playfields()
   -- playfield 1
-	line(15, 31, 56, 31, 8)
-	line(15, 31, 15, 112, 8)
-	line(15, 112, 56, 112, 8)
-	line(56, 31, 56, 112, 8)
+	line(9, 31, 50, 31, 8)
+	line(9, 31, 9, 112, 8)
+	line(9, 112, 50, 112, 8)
+	line(50, 31, 50, 112, 8)
 
   -- playfield 2
-	line(71, 31, 112, 31, 11)
-	line(71, 31, 71, 112, 11)
-	line(71, 112, 112, 112, 11)
-	line(112, 31, 112, 112, 11)
+	line(77, 31, 118, 31, 11)
+	line(77, 31, 77, 112, 11)
+	line(77, 112, 118, 112, 11)
+	line(118, 31, 118, 112, 11)
 
 	for x=1,10 do
 		for y=1,20 do
-			spr(pf1[x][y], 12+4*x, 28+4*y, 0.5, 0.5)
+			spr(pf1[x][y], 6+4*x, 28+4*y, 0.5, 0.5)
 		end
 	end
 
 	for x=1,10 do
 		for y=1,20 do
-			spr(pf2[x][y], 68+4*x, 28+4*y, 0.5, 0.5)
+			spr(pf2[x][y], 74+4*x, 28+4*y, 0.5, 0.5)
 		end
 	end
 end
 
+function render_status()
+  print(p1.level, 52, 92, 13)
+  print(ceil(p1.level / 100) * 100, 52, 102, 13)
+
+  print(p2.level, 65, 92, 13)
+  print(ceil(p1.level / 100) * 100, 65, 102, 13)
+end
+
 function render_currents()
-  draw_piece(p1.current, p1.rotation, 12+4*p1.column, 28+4*p1.row)
+  draw_piece(p1.current, p1.rotation, 6+4*p1.column, 28+4*p1.row)
   draw_piece(p2.current, p2.rotation, 68+4*p2.column, 28+4*p2.row)
 end
 
 function render_debug()
-  print(p1.gravity, 2, 2)
+  print(p1.gravity, 2, 2, 11)
   --print(p1.grounded, 8, 2)
   print(p1.das, 40, 2)
   print(p1.lspin, 50, 2)
   print(p1.rspin, 60, 2)
 
-	for x=1,10 do
-		for y=1,20 do
-      if pf1[x][y] != 0 then
-        print("x", 12+4*x, 28+4*y)
-      else
-        print(".", 12+4*x, 28+4*y)
-      end
-		end
-	end
+	--for x=1,10 do
+	--	for y=1,20 do
+  --    if pf1[x][y] != 0 then
+  --      print("x", 12+4*x, 28+4*y)
+  --    else
+  --      print(".", 12+4*x, 28+4*y)
+  --    end
+	--	end
+	--end
 end
 
 
@@ -178,17 +175,99 @@ end
 -->8
 -- physics
 
-function handle_gravity(player)
-  player.gravity += 1
-  if player.gravity > 20 then
-    player.row += 1
-    player.gravity = 0
+function handle_gravity(player, playfield)
+  if check_grounded(player, playfield) then
+    player.lock += 1
+
+    if player.lock >= 30 then
+      place_piece(player, playfield)
+    end
+  else
+    player.lock = 0
+    player.gravity += get_level_gravity(player.level) / 256
+
+    while player.gravity > 1 and not check_grounded(player, playfield) do
+      player.row += 1
+
+      if check_grounded(player, playfield) then
+        player.gravity = 0
+      else
+        player.gravity -= 1
+      end
+    end
   end
+end
+
+function get_level_gravity(level)
+  if level < 30 then
+    return 4
+  elseif level < 35 then
+    return 6
+  elseif level < 40 then
+    return 8
+  elseif level < 50 then
+    return 10
+  elseif level < 60 then
+    return 12
+  elseif level < 70 then
+    return 16
+  elseif level < 80 then
+    return 32
+  elseif level < 90 then
+    return 48
+  elseif level < 100 then
+    return 64
+  elseif level < 120 then
+    return 80
+  elseif level < 140 then
+    return 96
+  elseif level < 160 then
+    return 112
+  elseif level < 170 then
+    return 128
+  elseif level < 200 then
+    return 144
+  elseif level < 220 then
+    return 4
+  elseif level < 230 then
+    return 32
+  elseif level < 233 then
+    return 64
+  elseif level < 236 then
+    return 96
+  elseif level < 239 then
+    return 128
+  elseif level < 243 then
+    return 160
+  elseif level < 247 then
+    return 192
+  elseif level < 251 then
+    return 224
+  elseif level < 300 then
+    return 256
+  elseif level < 330 then
+    return 512
+  elseif level < 360 then
+    return 768
+  elseif level < 400 then
+    return 1024
+  elseif level < 420 then
+    return 1280
+  elseif level < 450 then
+    return 1024
+  elseif level < 500 then
+    return 768
+  end
+
+  return 5120
 end
 
 function next_piece()
   --needs bag system
   return flr(rnd(7)+1)
+end
+
+function place_piece()
 end
 
 function init_playfield()
@@ -208,15 +287,20 @@ function init_player(num)
   return {
     num = num,
     next = flr(rnd(7)+1),
+    --current = flr(rnd(7)+1),
     current = flr(rnd(7)+1),
-    row = 1,
-    das = 0,
     column = 4,
+    row = 1,
+
+    level = 70,
     gravity = 0,
+    lock = 0,
+    --grounded = false,
+
+    das = 0,
     rotation = 1,
     lspin = 0,
-    rspin = 0,
-    grounded = false
+    rspin = 0
   }
 end
 
