@@ -160,16 +160,21 @@ function render_status()
 end
 
 function render_currents()
-  draw_piece(p1.current, p1.rotation, 6+4*p1.column, 28+4*p1.row)
-  draw_piece(p2.current, p2.rotation, 74+4*p2.column, 28+4*p2.row)
+  if p1.are == -1 and p1.clear <= 0 then
+    draw_piece(p1.current, p1.rotation, 6+4*p1.column, 28+4*p1.row)
+  end
+
+  if p2.are == -1 and p2.clear <= 0 then
+    draw_piece(p2.current, p2.rotation, 74+4*p2.column, 28+4*p2.row)
+  end
 end
 
 function render_debug()
   print(p1.gravity, 2, 2, 11)
   --print(p1.grounded, 8, 2)
-  --print(p1.das, 40, 2)
   print('lock: ' .. p1.lock, 30, 2)
   print('are: ' .. p1.are, 60, 2)
+  print('clear: ' .. p1.clear, 80, 2)
 
 	--for x=1,10 do
 	--	for y=1,20 do
@@ -610,35 +615,42 @@ end
 
 function handle_game_input(player, playfield)
   -- movement
+  local down = btn(3, player.num)
   local left = btn(0, player.num)
   local right = btn(1, player.num)
 
-  if left and right then
-    player.das = 0
-  elseif left then
-    if player.das == 0 then
-      move_piece(player, playfield, 0)
-    elseif player.das <= -16 then
-      move_piece(player, playfield, 0)
-    elseif player.das > 0 then
-      move_piece(player, playfield, 0)
-      player.das = 0
-    end
-
-    player.das -= 1
-  elseif right then
-    if player.das == 0 then
-      move_piece(player, playfield, 1)
-    elseif player.das >= 16 then
-      move_piece(player, playfield, 1)
-    elseif player.das < 0 then
-      move_piece(player, playfield, 1)
-      player.das = 0
-    end
-
-    player.das += 1
+  if down then
+    player.soft = true
   else
-    player.das = 0
+    player.soft = false
+
+    if left and right then
+      player.das = 0
+    elseif left then
+      if player.das == 0 then
+        move_piece(player, playfield, 0)
+      elseif player.das <= -16 then
+        move_piece(player, playfield, 0)
+      elseif player.das > 0 then
+        move_piece(player, playfield, 0)
+        player.das = 0
+      end
+
+      player.das -= 1
+    elseif right then
+      if player.das == 0 then
+        move_piece(player, playfield, 1)
+      elseif player.das >= 16 then
+        move_piece(player, playfield, 1)
+      elseif player.das < 0 then
+        move_piece(player, playfield, 1)
+        player.das = 0
+      end
+
+      player.das += 1
+    else
+      player.das = 0
+    end
   end
 
   -- rotation
@@ -676,21 +688,13 @@ function handle_game_input(player, playfield)
   else
     player.rspin = false
   end
-
-  local down = btn(3, player.num)
-
-  if down then
-    player.soft = true
-  else
-    player.soft = false
-  end
 end
 
 __gfx__
 00000000666600006666000066660000666600006666000066660000666600000000000011111111000000000000000000000000000000000000000000000000
-00100000688800006bbb00006eee00006fff0000699900006aaa00006ccc00000000000010000001000000000000000000000000000000000000000000000000
-00000000688800006bbb00006eee00006fff0000699900006aaa00006ccc00000000000010000001000000000000000000000000000000000000000000000000
-00000000688800006bbb00006eee00006fff0000699900006aaa00006ccc00000000000010000001000000000000000000000000000000000000000000000000
+00100000688800006bbb0000622200006fff0000699900006aaa00006ccc00000000000010000001000000000000000000000000000000000000000000000000
+00000000688800006bbb0000622200006fff0000699900006aaa00006ccc00000000000010000001000000000000000000000000000000000000000000000000
+00000000688800006bbb0000622200006fff0000699900006aaa00006ccc00000000000010000001000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000010000001000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000010000001000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000010000001000000000000000000000000000000000000000000000000
