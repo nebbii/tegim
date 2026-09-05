@@ -218,6 +218,8 @@ function handle_lock(player, playfield)
 
   if player.lock >= 30 or player.soft then
     place_piece(player, playfield)
+
+    detect_lines(player, playfield)
   end
 end
 
@@ -227,6 +229,40 @@ function handle_spawn(player, playfield)
   end
 
   player.are -= 1
+end
+
+function detect_lines(player, playfield)
+  clears = {}
+
+	for y=1,20 do
+    count = 0
+
+		for x=1,10 do
+      if playfield[y][x] != 0 then
+        count += 1
+      end
+		end
+    if count >= 10 then
+      add(clears, y)
+    end
+	end
+
+  printh('cleary')
+  if #clears > 0 then
+    clear_lines(clears, player, playfield)
+  end
+end
+
+function clear_lines(clears, player, playfield)
+  for clear in all(clears) do
+    printh('delety!' .. clear)
+    deli(playfield, clear)
+    temp = {}
+    for column=1,10 do
+      add(temp, 0)
+    end
+    add(playfield, temp, 1)
+  end
 end
 
 function get_level_gravity(level)
