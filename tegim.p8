@@ -81,10 +81,9 @@ function _init()
 end
 
 function _update60()
-  handle_input(p1, pf1)
-  handle_input(p2, pf2)
-
   if p1.alive then
+    handle_game_input(p1, pf1)
+
     if p1.are >= 0 then
       handle_spawn(p1, pf1)
     elseif check_grounded(p1, pf1) then
@@ -95,6 +94,7 @@ function _update60()
   end
 
   if p2.alive then
+    handle_game_input(p2, pf2)
     if p2.are >= 0 then
       handle_spawn(p2, pf2)
     elseif check_grounded(p2, pf2) then
@@ -606,7 +606,7 @@ end
 -->8
 -- input
 
-function handle_input(player, playfield)
+function handle_game_input(player, playfield)
   -- movement
   local left = btn(0, player.num)
   local right = btn(1, player.num)
