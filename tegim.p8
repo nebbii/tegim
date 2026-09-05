@@ -184,12 +184,17 @@ function handle_gravity(player, playfield)
   if check_grounded(player, playfield) then
     player.lock += 1
 
-    if player.lock >= 30 then
+    if player.lock >= 30 or player.soft then
       place_piece(player, playfield)
     end
   else
     player.lock = 0
-    player.gravity += get_level_gravity(player.level) / 256
+    internal_gravity = get_level_gravity(player.level)
+    if internal_gravity < 256 and player.soft then
+      player.gravity += 1
+    else
+      player.gravity += get_level_gravity(player.level) / 256
+    end
 
     while player.gravity > 1 and not check_grounded(player, playfield) do
       player.row += 1
@@ -321,9 +326,10 @@ function init_player(num)
 
     das = 0,
     rotation = 1,
-    lspin = 0,
-    l2spin = 0,
-    rspin = 0,
+    lspin = false,
+    l2spin = false,
+    rspin = false,
+    soft = false,
 
     alive = true,
   }
@@ -579,33 +585,41 @@ function handle_input(player)
 
   -- IRS always prioritizes A over B
   if o then
-    if player.lspin == 0 then
+    if not player.lspin then
       spin_piece(p1, pf1, 0)
     end
 
-    player.lspin = 1
+    player.lspin = true
   else
-    player.lspin = 0
+    player.lspin = false
   end
 
   if up and three_button_spin then
-    if player.l2spin == 0 then
+    if not player.l2spin then
       spin_piece(p1, pf1, 0)
     end
 
-    player.l2spin = 1
+    player.l2spin = true
   else
-    player.l2spin = 0
+    player.l2spin = false
   end
 
   if x then
-    if player.rspin == 0 then
+    if not player.rspin then
       spin_piece(p1, pf1, 1)
     end
 
-    player.rspin = 1
+    player.rspin = true
   else
-    player.rspin = 0
+    player.rspin = false
+  end
+
+  local down = btn(3, player.num)
+
+  if down then
+    player.soft = true
+  else
+    player.soft = false
   end
 end
 
