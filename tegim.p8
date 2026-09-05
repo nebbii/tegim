@@ -147,7 +147,7 @@ end
 
 function render_currents()
   draw_piece(p1.current, p1.rotation, 6+4*p1.column, 28+4*p1.row)
-  draw_piece(p2.current, p2.rotation, 68+4*p2.column, 28+4*p2.row)
+  draw_piece(p2.current, p2.rotation, 74+4*p2.column, 28+4*p2.row)
 end
 
 function render_debug()
@@ -155,7 +155,7 @@ function render_debug()
   --print(p1.grounded, 8, 2)
   print(p1.das, 40, 2)
   print(p1.lock, 50, 2)
-  print(p1.rspin, 60, 2)
+  --print(p1.rspin, 60, 2)
 
 	--for x=1,10 do
 	--	for y=1,20 do
