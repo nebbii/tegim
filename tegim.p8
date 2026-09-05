@@ -2,6 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 43
 __lua__
 function _init()
+  three_button_spin = true
   pieces = {
     { -- i
       {{0,1},{1,1},{2,1},{3,1}},
@@ -97,6 +98,9 @@ function _draw()
   render_debug()
 end
 
+-->8
+-- rendering
+
 function render_previews()
   draw_piece(p1.next, 1, 24, 16)
   draw_piece(p2.next, 1, 94, 16)
@@ -145,7 +149,7 @@ function render_debug()
   print(p1.gravity, 2, 2, 11)
   --print(p1.grounded, 8, 2)
   print(p1.das, 40, 2)
-  print(p1.lspin, 50, 2)
+  print(p1.lock, 50, 2)
   print(p1.rspin, 60, 2)
 
 	--for x=1,10 do
@@ -159,10 +163,6 @@ function render_debug()
 	--end
 end
 
-
--->8
--- pieces
-
 function draw_piece(piece, rotation, x, y)
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
   local bricks = pieces[piece][rotation]
@@ -173,7 +173,7 @@ function draw_piece(piece, rotation, x, y)
 end
 
 -->8
--- physics
+-- logic
 
 function handle_gravity(player, playfield)
   if check_grounded(player, playfield) then
@@ -300,7 +300,8 @@ function init_player(num)
     das = 0,
     rotation = 1,
     lspin = 0,
-    rspin = 0
+    l2spin = 0,
+    rspin = 0,
   }
 end
 
@@ -550,7 +551,7 @@ function handle_input(player)
   -- rotation
   local o = btn(4, player.num)
   local x = btn(5, player.num)
---local up = btn(2, player.num)
+  local up = btn(2, player.num)
 
   -- IRS always prioritizes A over B
   if o then
@@ -561,6 +562,16 @@ function handle_input(player)
     player.lspin = 1
   else
     player.lspin = 0
+  end
+
+  if up and three_button_spin then
+    if player.l2spin == 0 then
+      spin_piece(p1, pf1, 0)
+    end
+
+    player.l2spin = 1
+  else
+    player.l2spin = 0
   end
 
   if x then
