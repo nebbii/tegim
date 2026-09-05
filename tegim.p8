@@ -53,6 +53,27 @@ function _init()
   pf1 = init_playfield()
   pf2 = init_playfield()
 
+--pf1[9][3] = 7
+--pf1[10][3] = 7
+
+--pf1[7][6] = 7
+--pf1[8][6] = 7
+--pf1[9][6] = 7
+--pf1[10][6] = 7
+
+--pf1[4][10] = 7
+--pf1[6][10] = 7
+--pf1[8][10] = 7
+--pf1[10][10] = 7
+
+--for i=1,10 do
+--  pf1[i][18] = 7
+--end
+--for i=2,9 do
+--  pf1[i][13] = 7
+--end
+
+
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
   p1 = init_player(0)
   p2 = init_player(1)
@@ -297,60 +318,44 @@ function check_kicks(player, playfield, direction)
     if is_any_tile_taken(player, playfield) then
       return false
     end
-  elseif player.current == 2 then -- z
-    if is_any_tile_taken(player, playfield) then
+  elseif player.current == 2 or
+    player.current == 3 then
+    if not passes_ars(player, playfield) then
+      return false
+    end
+  elseif player.current == 4 or -- j
+    player.current == 5 or -- l
+    player.current == 7 then -- t
+    if not passes_column_check_ars(player, playfield) then
+      return false
+    end
+  end
+
+  return true
+end
+
+function passes_ars(player, playfield)
+  if is_any_tile_taken(player, playfield) then
+    if try_regular_kick(player, playfield) then
+      return true
+    else
+      return false
+    end
+  end
+
+  return true
+end
+
+function passes_column_check_ars(player, playfield)
+  if is_any_tile_taken(player, playfield) then
+    if center_column_rule(player, playfield) then
       if try_regular_kick(player, playfield) then
         return true
       else
         return false
       end
-    end
-  elseif player.current == 3 then -- s
-    if is_any_tile_taken(player, playfield) then
-      if try_regular_kick(player, playfield) then
-        return true
-      else
-        return false
-      end
-    end
-  elseif player.current == 4 then -- j
-    if is_any_tile_taken(player, playfield) then
-      if center_column_rule(player, playfield) then
-        if try_regular_kick(player, playfield) then
-          return true
-        else
-          return false
-        end
-      else
-        return false
-      end
-    end
-  elseif player.current == 5 then -- l
-    if is_any_tile_taken(player, playfield) then
-      if center_column_rule(player, playfield) then
-        if try_regular_kick(player, playfield) then
-          printh('regular kick passed')
-          return true
-        else
-          return false
-        end
-      else
-        return false
-      end
-    end
-  elseif player.current == 6 then -- o
-    -- :thinking:
-  elseif player.current == 7 then -- t
-    if is_any_tile_taken(player, playfield) then
-      if center_column_rule(player, playfield) then
-        if try_regular_kick(player, playfield) then
-          return true
-        else
-          return false
-        end
-      else
-        return false
-      end
+    else
+      return false
     end
   end
 
