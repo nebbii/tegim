@@ -81,8 +81,8 @@ function _init()
 end
 
 function _update60()
-  handle_input(p1)
-  handle_input(p2)
+  handle_input(p1, pf1)
+  handle_input(p2, pf2)
 
   if p1.alive then
     if p1.are >= 0 then
@@ -606,7 +606,7 @@ end
 -->8
 -- input
 
-function handle_input(player)
+function handle_input(player, playfield)
   -- movement
   local left = btn(0, player.num)
   local right = btn(1, player.num)
@@ -615,22 +615,22 @@ function handle_input(player)
     player.das = 0
   elseif left then
     if player.das == 0 then
-      move_piece(p1, pf1, 0)
+      move_piece(player, playfield, 0)
     elseif player.das <= -16 then
-      move_piece(p1, pf1, 0)
+      move_piece(player, playfield, 0)
     elseif player.das > 0 then
-      move_piece(p1, pf1, 0)
+      move_piece(player, playfield, 0)
       player.das = 0
     end
 
     player.das -= 1
   elseif right then
     if player.das == 0 then
-      move_piece(p1, pf1, 1)
+      move_piece(player, playfield, 1)
     elseif player.das >= 16 then
-      move_piece(p1, pf1, 1)
+      move_piece(player, playfield, 1)
     elseif player.das < 0 then
-      move_piece(p1, pf1, 1)
+      move_piece(player, playfield, 1)
       player.das = 0
     end
 
@@ -647,7 +647,7 @@ function handle_input(player)
   -- IRS always prioritizes A over B
   if o then
     if not player.lspin then
-      spin_piece(p1, pf1, 0)
+      spin_piece(player, playfield, 0)
     end
 
     player.lspin = true
@@ -657,7 +657,7 @@ function handle_input(player)
 
   if up and three_button_spin then
     if not player.l2spin then
-      spin_piece(p1, pf1, 0)
+      spin_piece(player, playfield, 0)
     end
 
     player.l2spin = true
@@ -667,7 +667,7 @@ function handle_input(player)
 
   if x then
     if not player.rspin then
-      spin_piece(p1, pf1, 1)
+      spin_piece(player, playfield, 1)
     end
 
     player.rspin = true
