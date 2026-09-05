@@ -314,17 +314,18 @@ function init_player(num)
   return {
     num = num,
     next = flr(rnd(7)+1),
-    --current = flr(rnd(7)+1),
     current = flr(rnd(7)+1),
     column = 4,
     row = 1,
-
     level = 70,
     gravity = 0,
-    lock = 0,
-    --grounded = false,
 
+    -- delays
+    are = 0,
     das = 0,
+    lock = 0,
+    clear = 0,
+
     rotation = 1,
     lspin = false,
     l2spin = false,
