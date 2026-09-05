@@ -85,11 +85,24 @@ function _update60()
   handle_input(p2)
 
   if p1.alive then
-    handle_gravity(p1, pf1)
+    if p1.are >= 0 then
+      --printh('p1: handling spawn')
+      handle_spawn(p1, pf1)
+    elseif check_grounded(p1, pf1) then
+      --printh('p1: handling lock')
+      handle_lock(p1, pf1)
+    else
+      --printh('p1: handling gravity')
+      handle_gravity(p1, pf1)
+    end
   end
 
   if p2.alive then
-    handle_gravity(p2, pf2)
+    if check_grounded(p2, pf2) then
+      handle_lock(p2, pf2)
+    else
+      handle_gravity(p2, pf2)
+    end
   end
 end
 
@@ -153,9 +166,9 @@ end
 function render_debug()
   print(p1.gravity, 2, 2, 11)
   --print(p1.grounded, 8, 2)
-  print(p1.das, 40, 2)
-  print(p1.lock, 50, 2)
-  --print(p1.rspin, 60, 2)
+  --print(p1.das, 40, 2)
+  print('lock: ' .. p1.lock, 30, 2)
+  print('are: ' .. p1.are, 60, 2)
 
 	--for x=1,10 do
 	--	for y=1,20 do
@@ -181,31 +194,40 @@ end
 -- logic
 
 function handle_gravity(player, playfield)
-  if check_grounded(player, playfield) then
-    player.lock += 1
+  player.lock = 0
+  internal_gravity = get_level_gravity(player.level)
 
-    if player.lock >= 30 or player.soft then
-      place_piece(player, playfield)
-    end
+  if player.soft and internal_gravity < 256 then
+    player.gravity += 1
   else
-    player.lock = 0
-    internal_gravity = get_level_gravity(player.level)
-    if internal_gravity < 256 and player.soft then
-      player.gravity += 1
+    player.gravity += internal_gravity / 256
+  end
+
+  while player.gravity > 1 do
+    player.row += 1
+
+    if check_grounded(player, playfield) then
+      player.gravity = 0
     else
-      player.gravity += get_level_gravity(player.level) / 256
-    end
-
-    while player.gravity > 1 and not check_grounded(player, playfield) do
-      player.row += 1
-
-      if check_grounded(player, playfield) then
-        player.gravity = 0
-      else
-        player.gravity -= 1
-      end
+      player.gravity -= 1
     end
   end
+end
+
+function handle_lock(player, playfield)
+  player.lock += 1
+
+  if player.lock >= 30 or player.soft then
+    place_piece(player, playfield)
+  end
+end
+
+function handle_spawn(player, playfield)
+  if player.are <= 0 then
+    next_piece(player, playfield)
+  end
+
+  player.are -= 1
 end
 
 function get_level_gravity(level)
@@ -281,6 +303,7 @@ function next_piece(player, playfield)
   player.column = 4
   player.row = 1
   player.level += 1
+  player.lock = 0
 
   if is_any_tile_taken(player, playfield) then
     player.alive = false
@@ -294,7 +317,8 @@ function place_piece(player, playfield)
     playfield[player.column + block[1]][player.row + block[2]] = player.current
   end
 
-  next_piece(player, playfield)
+  player.lock = 0
+  player.are = 30
 end
 
 function init_playfield()
@@ -321,7 +345,7 @@ function init_player(num)
     gravity = 0,
 
     -- delays
-    are = 0,
+    are = -1,
     das = 0,
     lock = 0,
     clear = 0,
@@ -505,10 +529,10 @@ function center_column_rule(player, playfield, center)
       local by = player.row + y
 
       if is_tile_taken(playfield, bx, by) and not x == 1 then
-        printh('center column rule: passed on ' .. x .. ', ' .. y)
+        --printh('center column rule: passed on ' .. x .. ', ' .. y)
         return true
       elseif is_tile_taken(playfield, bx, by) and x == 1 then
-        printh('center column rule: rejected on ' .. x .. ', ' .. y)
+        --printh('center column rule: rejected on ' .. x .. ', ' .. y)
         return false
       end
     end
