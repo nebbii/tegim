@@ -86,26 +86,20 @@ function _update60()
 
   if p1.alive then
     if p1.are >= 0 then
-      --printh('p1: handling spawn')
       handle_spawn(p1, pf1)
     elseif check_grounded(p1, pf1) then
-      --printh('p1: handling lock')
       handle_lock(p1, pf1)
     else
-      --printh('p1: handling gravity')
       handle_gravity(p1, pf1)
     end
   end
 
   if p2.alive then
     if p2.are >= 0 then
-      --printh('p2: handling spawn')
       handle_spawn(p2, pf2)
     elseif check_grounded(p2, pf2) then
-      --printh('p2: handling lock')
       handle_lock(p2, pf2)
     else
-      --printh('p2: handling gravity')
       handle_gravity(p2, pf2)
     end
   end
@@ -142,15 +136,15 @@ function render_playfields()
 	line(77, 112, 118, 112, 11)
 	line(118, 31, 118, 112, 11)
 
-	for x=1,10 do
-		for y=1,20 do
-			spr(pf1[x][y], 6+4*x, 28+4*y, 0.5, 0.5)
+	for y=1,20 do
+		for x=1,10 do
+			spr(pf1[y][x], 6+4*x, 28+4*y, 0.5, 0.5)
 		end
 	end
 
-	for x=1,10 do
-		for y=1,20 do
-			spr(pf2[x][y], 74+4*x, 28+4*y, 0.5, 0.5)
+	for y=1,20 do
+		for x=1,10 do
+			spr(pf2[y][x], 74+4*x, 28+4*y, 0.5, 0.5)
 		end
 	end
 end
@@ -319,7 +313,7 @@ function place_piece(player, playfield)
   local piece = pieces[player.current][player.rotation]
 
   for block in all(piece) do
-    playfield[player.column + block[1]][player.row + block[2]] = player.current
+    playfield[player.row + block[2]][player.column + block[1]] = player.current
   end
 
   player.lock = 0
@@ -329,10 +323,10 @@ end
 function init_playfield()
   local pf = {}
 
-  for column=1,10 do
-    pf[column]={}
-    for row=1,20 do
-      pf[column][row]=0
+  for row=1,20 do
+    pf[row]={}
+    for column=1,10 do
+      pf[row][column]=0
     end
   end
 
@@ -375,7 +369,8 @@ function check_grounded(player, playfield)
     local bx = x + block[1]
     local by = y + block[2]
 
-    if playfield[bx][by+1] != 0 then
+    if by+1 > #playfield or
+     playfield[by+1][bx] != 0 then
       return true
     end
   end
@@ -396,7 +391,7 @@ function check_walls(player, playfield, move)
       return true
     end
 
-    if playfield[bx+move][by] != 0 then
+    if playfield[by][bx+move] != 0 then
       return true
     end
   end
@@ -547,9 +542,9 @@ function center_column_rule(player, playfield, center)
 end
 
 function is_tile_taken(playfield, x, y)
-  if playfield[x] == nil or playfield[x][y] == nil then
+  if playfield[y] == nil or playfield[y][x] == nil then
     return true
-  elseif playfield[x][y] != 0 then
+  elseif playfield[y][x] != 0 then
     return true
   end
 
