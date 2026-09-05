@@ -98,9 +98,14 @@ function _update60()
   end
 
   if p2.alive then
-    if check_grounded(p2, pf2) then
+    if p2.are >= 0 then
+      --printh('p2: handling spawn')
+      handle_spawn(p2, pf2)
+    elseif check_grounded(p2, pf2) then
+      --printh('p2: handling lock')
       handle_lock(p2, pf2)
     else
+      --printh('p2: handling gravity')
       handle_gravity(p2, pf2)
     end
   end
