@@ -3,7 +3,7 @@ version 43
 __lua__
 function _init()
   three_button_spin = true
-  pal(15, 140, 1)
+  pal(15, 140, 1) -- more visible on crts
 
   pieces = {
     { -- i
@@ -79,14 +79,16 @@ function _init()
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
   p1 = init_player(0)
   p2 = init_player(1)
-  music(0)
+  --music(0)
 end
 
 function _update60()
   if p1.alive then
     handle_game_input(p1, pf1)
 
-    if p1.are >= 0 then
+    if p1.clear > 0 then
+      handle_clear(p1, pf1)
+    elseif p1.are >= 0 then
       handle_spawn(p1, pf1)
     elseif check_grounded(p1, pf1) then
       handle_lock(p1, pf1)
@@ -97,7 +99,10 @@ function _update60()
 
   if p2.alive then
     handle_game_input(p2, pf2)
-    if p2.are >= 0 then
+
+    if p1.clear > 0 then
+      handle_clear(p1, pf1)
+    elseif p2.are >= 0 then
       handle_spawn(p2, pf2)
     elseif check_grounded(p2, pf2) then
       handle_lock(p2, pf2)
@@ -172,8 +177,8 @@ end
 function render_debug()
   print(p1.gravity, 2, 2, 11)
   --print(p1.grounded, 8, 2)
-  print('lock: ' .. p1.lock, 30, 2)
-  print('are: ' .. p1.are, 60, 2)
+  print('lock: ' .. p1.lock, 20, 2)
+  print('are: ' .. p1.are, 50, 2)
   print('clear: ' .. p1.clear, 80, 2)
 
 	--for x=1,10 do
@@ -238,6 +243,14 @@ function handle_spawn(player, playfield)
   player.are -= 1
 end
 
+function handle_clear(player, playfield)
+  if player.clear > 0 then
+    player.clear -= 1
+  end
+
+  -- clear animation here? :thinking:
+end
+
 function detect_lines(player, playfield)
   clears = {}
 
@@ -256,6 +269,7 @@ function detect_lines(player, playfield)
 
   printh('cleary')
   if #clears > 0 then
+    player.clear = 41
     clear_lines(clears, player, playfield)
   end
 end
