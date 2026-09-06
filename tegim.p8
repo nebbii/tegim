@@ -317,11 +317,20 @@ function next_piece(player)
   -- grabs piece shown in preview
   player.current = player.next
   player.next = flr(rnd(7)+1)
-  player.rotation = 1
-  player.column = 4
   player.row = 1
   player.level += 1
   player.lock = 0
+
+  -- irs always prioritizes a over b
+  if player.lspin or player.l2spin then
+    player.rotation = 4
+  elseif player.rspin then
+    player.rotation = 2
+  else
+    player.rotation = 1
+  end
+
+  player.column = 4
 
   if is_any_tile_taken(player) then
     player.alive = false
@@ -635,7 +644,6 @@ function handle_game_input(player)
   local x = btn(5, player.num)
   local up = btn(2, player.num)
 
-  -- IRS always prioritizes A over B
   if o then
     if not player.lspin then
       spin_piece(player, 0)
