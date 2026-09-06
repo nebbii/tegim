@@ -81,7 +81,7 @@ function _draw()
   render_status()
   render_previews()
   render_currents()
-  --render_debug()
+  render_debug()
 end
 
 -->8
@@ -128,7 +128,11 @@ end
 
 function render_currents()
   if players[1].are == -1 and players[1].clear <= 0 then
-    draw_piece(players[1].current, players[1].rotation, 6+4*players[1].column, 28+4*players[1].row)
+    if players[1].lock == 29 then
+      draw_piece(players[1].current, players[1].rotation, 6+4*players[1].column, 28+4*players[1].row, 18)
+    else
+      draw_piece(players[1].current, players[1].rotation, 6+4*players[1].column, 28+4*players[1].row)
+    end
   end
 
   if players[2].are == -1 and players[2].clear <= 0 then
@@ -139,7 +143,7 @@ end
 function render_debug()
   print(players[1].gravity, 2, 2, 11)
   --print(players[1].grounded, 8, 2)
-  print('lock: ' .. players[1].are.lock, 20, 2)
+  print('lock: ' .. players[1].lock, 20, 2)
   print('are: ' .. players[1].are, 50, 2)
   print('clear: ' .. players[1].clear, 80, 2)
 
@@ -154,12 +158,16 @@ function render_debug()
 	--end
 end
 
-function draw_piece(piece, rotation, x, y)
+function draw_piece(piece, rotation, x, y, color)
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
   local bricks = pieces[piece][rotation]
 
   for block in all(bricks) do
-    spr(piece, x+block[1]*4, y+block[2]*4, 0.5, 0.5)
+    if color == nil then
+      spr(piece, x+block[1]*4, y+block[2]*4, 0.5, 0.5)
+    else
+      spr(color, x+block[1]*4, y+block[2]*4, 0.5, 0.5)
+    end
   end
 end
 
@@ -190,7 +198,9 @@ end
 function handle_lock(player)
   player.lock += 1
 
-  if player.lock >= 30 or player.soft then
+  if player.lock < 30 and player.soft then
+    player.lock = 29
+  elseif player.lock >= 30 then
     place_piece(player)
 
     detect_lines(player)
@@ -824,4 +834,3 @@ __music__
 00 25262712
 00 28292a12
 02 01021a0a
-
