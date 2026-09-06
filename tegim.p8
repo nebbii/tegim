@@ -50,64 +50,26 @@ function _init()
     }
   }
 
-  psize_x = 10
-  psize_y = 20
-
-  pf1 = init_playfield()
-  pf2 = init_playfield()
-
-  --pf1[9][3] = 7
-  --pf1[10][3] = 7
-
-  --pf1[7][6] = 7
-  --pf1[8][6] = 7
-  --pf1[9][6] = 7
-  --pf1[10][6] = 7
-
-  --pf1[4][10] = 7
-  --pf1[6][10] = 7
-  --pf1[8][10] = 7
-  --pf1[10][10] = 7
-
-  --for i=1,10 do
-  --  pf1[i][18] = 7
-  --end
-  --for i=2,9 do
-  --  pf1[i][13] = 7
-  --end
-
-  -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
-  p1 = init_player(0)
-  p2 = init_player(1)
-  --music(0)
+  players = {
+    init_player(0),
+    init_player(1)
+  }
 end
 
 function _update60()
-  if p1.alive then
-    handle_game_input(p1, pf1)
+  for num, player in ipairs(players) do
+    if player.alive then
+      handle_game_input(player)
 
-    if p1.clear > 0 then
-      handle_clear(p1, pf1)
-    elseif p1.are >= 0 then
-      handle_spawn(p1, pf1)
-    elseif check_grounded(p1, pf1) then
-      handle_lock(p1, pf1)
-    else
-      handle_gravity(p1, pf1)
-    end
-  end
-
-  if p2.alive then
-    handle_game_input(p2, pf2)
-
-    if p1.clear > 0 then
-      handle_clear(p1, pf1)
-    elseif p2.are >= 0 then
-      handle_spawn(p2, pf2)
-    elseif check_grounded(p2, pf2) then
-      handle_lock(p2, pf2)
-    else
-      handle_gravity(p2, pf2)
+      if player.clear > 0 then
+        handle_clear(player)
+      elseif player.are >= 0 then
+        handle_spawn(player)
+      elseif check_grounded(player) then
+        handle_lock(player)
+      else
+        handle_gravity(player)
+      end
     end
   end
 end
@@ -126,8 +88,8 @@ end
 -- rendering
 
 function render_previews()
-  draw_piece(p1.next, 1, 24, 16)
-  draw_piece(p2.next, 1, 94, 16)
+  draw_piece(players[1].next, 1, 24, 16)
+  draw_piece(players[2].next, 1, 90, 16)
 end
 
 function render_playfields()
@@ -145,41 +107,41 @@ function render_playfields()
 
 	for y=1,20 do
 		for x=1,10 do
-			spr(pf1[y][x], 6+4*x, 28+4*y, 0.5, 0.5)
+			spr(players[1].playfield[y][x], 6+4*x, 28+4*y, 0.5, 0.5)
 		end
 	end
 
 	for y=1,20 do
 		for x=1,10 do
-			spr(pf2[y][x], 74+4*x, 28+4*y, 0.5, 0.5)
+			spr(players[2].playfield[y][x], 74+4*x, 28+4*y, 0.5, 0.5)
 		end
 	end
 end
 
 function render_status()
-  print(p1.level, 52, 92, 13)
-  print(ceil(p1.level / 100) * 100, 52, 102, 13)
+  print(players[1].level, 52, 92, 13)
+  print(ceil(players[1].level / 100) * 100, 52, 102, 13)
 
-  print(p2.level, 65, 92, 13)
-  print(ceil(p1.level / 100) * 100, 65, 102, 13)
+  print(players[2].level, 65, 92, 13)
+  print(ceil(players[2].level / 100) * 100, 65, 102, 13)
 end
 
 function render_currents()
-  if p1.are == -1 and p1.clear <= 0 then
-    draw_piece(p1.current, p1.rotation, 6+4*p1.column, 28+4*p1.row)
+  if players[1].are == -1 and players[1].clear <= 0 then
+    draw_piece(players[1].current, players[1].rotation, 6+4*players[1].column, 28+4*players[1].row)
   end
 
-  if p2.are == -1 and p2.clear <= 0 then
-    draw_piece(p2.current, p2.rotation, 74+4*p2.column, 28+4*p2.row)
+  if players[2].are == -1 and players[2].clear <= 0 then
+    draw_piece(players[2].current, players[2].rotation, 74+4*players[2].column, 28+4*players[2].row)
   end
 end
 
 function render_debug()
-  print(p1.gravity, 2, 2, 11)
-  --print(p1.grounded, 8, 2)
-  print('lock: ' .. p1.lock, 20, 2)
-  print('are: ' .. p1.are, 50, 2)
-  print('clear: ' .. p1.clear, 80, 2)
+  print(players[1].gravity, 2, 2, 11)
+  --print(players[1].grounded, 8, 2)
+  print('lock: ' .. players[1].are.lock, 20, 2)
+  print('are: ' .. players[1].are, 50, 2)
+  print('clear: ' .. players[1].clear, 80, 2)
 
 	--for x=1,10 do
 	--	for y=1,20 do
@@ -204,7 +166,7 @@ end
 -->8
 -- logic
 
-function handle_gravity(player, playfield)
+function handle_gravity(player)
   player.lock = 0
   internal_gravity = get_level_gravity(player.level)
 
@@ -217,7 +179,7 @@ function handle_gravity(player, playfield)
   while player.gravity > 1 do
     player.row += 1
 
-    if check_grounded(player, playfield) then
+    if check_grounded(player) then
       player.gravity = 0
     else
       player.gravity -= 1
@@ -225,25 +187,25 @@ function handle_gravity(player, playfield)
   end
 end
 
-function handle_lock(player, playfield)
+function handle_lock(player)
   player.lock += 1
 
   if player.lock >= 30 or player.soft then
-    place_piece(player, playfield)
+    place_piece(player)
 
-    detect_lines(player, playfield)
+    detect_lines(player)
   end
 end
 
-function handle_spawn(player, playfield)
+function handle_spawn(player)
   if player.are <= 0 then
-    next_piece(player, playfield)
+    next_piece(player)
   end
 
   player.are -= 1
 end
 
-function handle_clear(player, playfield)
+function handle_clear(player)
   if player.clear > 0 then
     player.clear -= 1
   end
@@ -251,14 +213,14 @@ function handle_clear(player, playfield)
   -- clear animation here? :thinking:
 end
 
-function detect_lines(player, playfield)
+function detect_lines(player)
   clears = {}
 
 	for y=1,20 do
     count = 0
 
 		for x=1,10 do
-      if playfield[y][x] != 0 then
+      if player.playfield[y][x] != 0 then
         count += 1
       end
 		end
@@ -270,19 +232,19 @@ function detect_lines(player, playfield)
   printh('cleary')
   if #clears > 0 then
     player.clear = 41
-    clear_lines(clears, player, playfield)
+    clear_lines(clears, player)
   end
 end
 
-function clear_lines(clears, player, playfield)
+function clear_lines(clears, player)
   for clear in all(clears) do
     printh('delety!' .. clear)
-    deli(playfield, clear)
+    deli(player.playfield, clear)
     temp = {}
     for column=1,10 do
       add(temp, 0)
     end
-    add(playfield, temp, 1)
+    add(player.playfield, temp, 1)
   end
 end
 
@@ -350,7 +312,7 @@ function get_level_gravity(level)
   return 5120
 end
 
-function next_piece(player, playfield)
+function next_piece(player)
   --needs bag system
   -- grabs piece shown in preview
   player.current = player.next
@@ -361,16 +323,16 @@ function next_piece(player, playfield)
   player.level += 1
   player.lock = 0
 
-  if is_any_tile_taken(player, playfield) then
+  if is_any_tile_taken(player) then
     player.alive = false
   end
 end
 
-function place_piece(player, playfield)
+function place_piece(player)
   local piece = pieces[player.current][player.rotation]
 
   for block in all(piece) do
-    playfield[player.row + block[2]][player.column + block[1]] = player.current
+    player.playfield[player.row + block[2]][player.column + block[1]] = player.current
   end
 
   player.lock = 0
@@ -393,6 +355,7 @@ end
 function init_player(num)
   return {
     num = num,
+    playfield = init_playfield(),
     next = flr(rnd(7)+1),
     current = flr(rnd(7)+1),
     column = 4,
@@ -416,7 +379,7 @@ function init_player(num)
   }
 end
 
-function check_grounded(player, playfield)
+function check_grounded(player)
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
   local piece = pieces[player.current][player.rotation]
   local x = player.column
@@ -426,8 +389,8 @@ function check_grounded(player, playfield)
     local bx = x + block[1]
     local by = y + block[2]
 
-    if by+1 > #playfield or
-     playfield[by+1][bx] != 0 then
+    if by+1 > #player.playfield or
+     player.playfield[by+1][bx] != 0 then
       return true
     end
   end
@@ -435,7 +398,7 @@ function check_grounded(player, playfield)
   return false
 end
 
-function check_walls(player, playfield, move)
+function check_walls(player, move)
   -- 1=I, 2=Z, 3=S, 4=J, 5=L, 6=O, 7=T
   local piece = pieces[player.current][player.rotation]
   local x = player.column
@@ -448,7 +411,7 @@ function check_walls(player, playfield, move)
       return true
     end
 
-    if playfield[by][bx+move] != 0 then
+    if player.playfield[by][bx+move] != 0 then
       return true
     end
   end
@@ -456,25 +419,25 @@ function check_walls(player, playfield, move)
   return false
 end
 
-function move_piece(player, playfield, direction)
+function move_piece(player, direction)
   if direction == 0 then
-    if not check_walls(player, playfield, -1) then
+    if not check_walls(player, -1) then
       player.column -= 1
     end
   end
 
   if direction == 1 then
-    if not check_walls(player, playfield, 1) then
+    if not check_walls(player, 1) then
       player.column += 1
     end
   end
 end
 
-function spin_piece(player, playfield, direction)
+function spin_piece(player, direction)
   if direction == 0 then
     decrease_rotation(player)
 
-    if not check_kicks(player, playfield, -1) then
+    if not check_kicks(player, -1) then
       increase_rotation(player)
     end
   end
@@ -482,7 +445,7 @@ function spin_piece(player, playfield, direction)
   if direction == 1 then
     increase_rotation(player)
 
-    if not check_kicks(player, playfield, 1) then
+    if not check_kicks(player, 1) then
       decrease_rotation(player)
     end
   end
@@ -506,24 +469,24 @@ end
 
 -- returns true upon no rules broken
 --  or a successful kick
-function check_kicks(player, playfield, direction)
+function check_kicks(player, direction)
   local piece = pieces[player.current][player.rotation]
   local x = player.column
   local y = player.row
 
   if player.current == 1 then -- i
-    if is_any_tile_taken(player, playfield) then
+    if is_any_tile_taken(player) then
       return false
     end
   elseif player.current == 2 or
     player.current == 3 then
-    if not passes_ars(player, playfield) then
+    if not passes_ars(player) then
       return false
     end
   elseif player.current == 4 or -- j
     player.current == 5 or -- l
     player.current == 7 then -- t
-    if not passes_column_check_ars(player, playfield) then
+    if not passes_column_check_ars(player) then
       return false
     end
   end
@@ -531,9 +494,9 @@ function check_kicks(player, playfield, direction)
   return true
 end
 
-function passes_ars(player, playfield)
-  if is_any_tile_taken(player, playfield) then
-    if try_regular_kick(player, playfield) then
+function passes_ars(player)
+  if is_any_tile_taken(player) then
+    if try_regular_kick(player) then
       return true
     else
       return false
@@ -543,10 +506,10 @@ function passes_ars(player, playfield)
   return true
 end
 
-function passes_column_check_ars(player, playfield)
-  if is_any_tile_taken(player, playfield) then
-    if center_column_rule(player, playfield) then
-      if try_regular_kick(player, playfield) then
+function passes_column_check_ars(player)
+  if is_any_tile_taken(player) then
+    if center_column_rule(player) then
+      if try_regular_kick(player) then
         return true
       else
         return false
@@ -559,10 +522,10 @@ function passes_column_check_ars(player, playfield)
   return true
 end
 
-function try_regular_kick(player, playfield)
+function try_regular_kick(player)
   player.column += 1
 
-  if is_any_tile_taken(player, playfield) then
+  if is_any_tile_taken(player) then
     player.column -= 1
   else
     return true
@@ -570,7 +533,7 @@ function try_regular_kick(player, playfield)
 
   player.column -= 1
 
-  if is_any_tile_taken(player, playfield) then
+  if is_any_tile_taken(player) then
     player.column += 1
   else
     return true
@@ -579,16 +542,16 @@ function try_regular_kick(player, playfield)
   return false
 end
 
-function center_column_rule(player, playfield, center)
+function center_column_rule(player, center)
   for x=0,2 do
     for y=0,2 do
       local bx = player.column + x
       local by = player.row + y
 
-      if is_tile_taken(playfield, bx, by) and not x == 1 then
+      if is_tile_taken(player.playfield, bx, by) and not x == 1 then
         --printh('center column rule: passed on ' .. x .. ', ' .. y)
         return true
-      elseif is_tile_taken(playfield, bx, by) and x == 1 then
+      elseif is_tile_taken(player.playfield, bx, by) and x == 1 then
         --printh('center column rule: rejected on ' .. x .. ', ' .. y)
         return false
       end
@@ -608,7 +571,7 @@ function is_tile_taken(playfield, x, y)
   return false
 end
 
-function is_any_tile_taken(player, playfield)
+function is_any_tile_taken(player)
   local piece = pieces[player.current][player.rotation]
   local x = player.column
   local y = player.row
@@ -617,7 +580,7 @@ function is_any_tile_taken(player, playfield)
     local bx = x + block[1]
     local by = y + block[2]
 
-    if is_tile_taken(playfield, bx, by) then return true end
+    if is_tile_taken(player.playfield, bx, by) then return true end
   end
 
   return false
@@ -627,7 +590,7 @@ end
 -->8
 -- input
 
-function handle_game_input(player, playfield)
+function handle_game_input(player)
   -- movement
   local down = btn(3, player.num)
   local left = btn(0, player.num)
@@ -642,22 +605,22 @@ function handle_game_input(player, playfield)
       player.das = 0
     elseif left then
       if player.das == 0 then
-        move_piece(player, playfield, 0)
+        move_piece(player, 0)
       elseif player.das <= -16 then
-        move_piece(player, playfield, 0)
+        move_piece(player, 0)
       elseif player.das > 0 then
-        move_piece(player, playfield, 0)
+        move_piece(player, 0)
         player.das = 0
       end
 
       player.das -= 1
     elseif right then
       if player.das == 0 then
-        move_piece(player, playfield, 1)
+        move_piece(player, 1)
       elseif player.das >= 16 then
-        move_piece(player, playfield, 1)
+        move_piece(player, 1)
       elseif player.das < 0 then
-        move_piece(player, playfield, 1)
+        move_piece(player, 1)
         player.das = 0
       end
 
@@ -675,7 +638,7 @@ function handle_game_input(player, playfield)
   -- IRS always prioritizes A over B
   if o then
     if not player.lspin then
-      spin_piece(player, playfield, 0)
+      spin_piece(player, 0)
     end
 
     player.lspin = true
@@ -685,7 +648,7 @@ function handle_game_input(player, playfield)
 
   if up and three_button_spin then
     if not player.l2spin then
-      spin_piece(player, playfield, 0)
+      spin_piece(player, 0)
     end
 
     player.l2spin = true
@@ -695,7 +658,7 @@ function handle_game_input(player, playfield)
 
   if x then
     if not player.rspin then
-      spin_piece(player, playfield, 1)
+      spin_piece(player, 1)
     end
 
     player.rspin = true
