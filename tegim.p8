@@ -203,7 +203,12 @@ function handle_lock(player)
   elseif player.lock >= 30 then
     place_piece(player)
 
-    detect_lines(player)
+    local lines_to_clear = detect_lines(player)
+
+    if #lines_to_clear > 0 then
+      player.lines_to_clear = lines_to_clear
+      player.clear = 41
+    end
   end
 end
 
@@ -220,7 +225,9 @@ function handle_clear(player)
     player.clear -= 1
   end
 
-  -- clear animation here? :thinking:
+  if player.clear == 20 then
+    clear_lines(player)
+  end
 end
 
 function detect_lines(player)
@@ -239,16 +246,11 @@ function detect_lines(player)
     end
 	end
 
-  printh('cleary')
-  if #clears > 0 then
-    player.clear = 41
-    clear_lines(clears, player)
-  end
+  return clears
 end
 
-function clear_lines(clears, player)
-  for clear in all(clears) do
-    printh('delety!' .. clear)
+function clear_lines(player)
+  for clear in all(player.lines_to_clear) do
     deli(player.playfield, clear)
     temp = {}
     for column=1,10 do
@@ -256,6 +258,8 @@ function clear_lines(clears, player)
     end
     add(player.playfield, temp, 1)
   end
+
+  player.lines_to_clear = {}
 end
 
 function get_level_gravity(level)
@@ -381,6 +385,7 @@ function init_player(num)
     row = 1,
     level = 1,
     gravity = 0,
+    lines_to_clear = {},
 
     -- delays
     are = -1,
