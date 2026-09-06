@@ -2,7 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 43
 __lua__
 function _init()
-  three_button_spin = true
+  three_button_spin = false
   pal(15, 140, 1) -- more visible on crts
 
   pieces = {
@@ -83,7 +83,7 @@ function _draw()
   render_status()
   render_previews()
   render_currents()
-  render_debug()
+  --render_debug()
 end
 
 -->8
@@ -678,11 +678,11 @@ function handle_game_input(player)
   end
 
   -- rotation
-  local o = btn(4, player.num)
   local x = btn(5, player.num)
+  local o = btn(4, player.num)
   local up = btn(2, player.num)
 
-  if o then
+  if x then
     if not player.lspin then
       spin_piece(player, 0)
     end
@@ -702,7 +702,7 @@ function handle_game_input(player)
     player.l2spin = false
   end
 
-  if x then
+  if o then
     if not player.rspin then
       spin_piece(player, 1)
     end
