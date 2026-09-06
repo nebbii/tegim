@@ -105,17 +105,13 @@ function render_playfields()
 	line(77, 112, 118, 112, 11)
 	line(118, 31, 118, 112, 11)
 
-	for y=1,20 do
-		for x=1,10 do
-			spr(players[1].playfield[y][x], 6+4*x, 28+4*y, 0.5, 0.5)
-		end
-	end
-
-	for y=1,20 do
-		for x=1,10 do
-			spr(players[2].playfield[y][x], 74+4*x, 28+4*y, 0.5, 0.5)
-		end
-	end
+  for num, player in ipairs(players) do
+    for y=1,20 do
+      for x=1,10 do
+        spr(player.playfield[y][x], player.x_offset+4*x, player.y_offset+4*y, 0.5, 0.5)
+      end
+    end
+  end
 end
 
 function render_status()
@@ -376,6 +372,9 @@ function init_playfield()
 end
 
 function init_player(num)
+  local x_offsets = {6, 74}
+  local y_offsets = {28, 28}-- unused for now :thinking:
+
   return {
     num = num,
     playfield = init_playfield(),
@@ -386,6 +385,9 @@ function init_player(num)
     level = 1,
     gravity = 0,
     lines_to_clear = {},
+
+    x_offset = x_offsets[num+1],
+    y_offset = y_offsets[num+1],
 
     -- delays
     are = -1,
