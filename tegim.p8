@@ -54,6 +54,8 @@ function _init()
     init_player(0),
     init_player(1)
   }
+
+  music(0)
 end
 
 function _update60()
@@ -92,23 +94,42 @@ function render_previews()
   draw_piece(players[2].next, 1, 90, 16)
 end
 
+-- snippet from Ben Tasker's blog: https://snippets.bentasker.co.uk/posts/lua/check-if-value-exists-in-table.html
+function table_contains(tbl, x)
+  found = false
+  for _, v in pairs(tbl) do
+    if v == x then
+      found = true
+    end
+  end
+  return found
+end
+
 function render_playfields()
-  -- playfield 1
-	line(9, 31, 50, 31, 8)
-	line(9, 31, 9, 112, 8)
-	line(9, 112, 50, 112, 8)
-	line(50, 31, 50, 112, 8)
-
-  -- playfield 2
-	line(77, 31, 118, 31, 11)
-	line(77, 31, 77, 112, 11)
-	line(77, 112, 118, 112, 11)
-	line(118, 31, 118, 112, 11)
-
   for num, player in ipairs(players) do
+    local colors = {8, 11}
+
+    line(3+player.x_offset, 3+player.y_offset, 44+player.x_offset, 3+player.y_offset, colors[num])
+    line(3+player.x_offset, 3+player.y_offset, 3+player.x_offset, 84+player.y_offset, colors[num])
+    line(3+player.x_offset, 84+player.y_offset, 44+player.x_offset, 84+player.y_offset, colors[num])
+    line(44+player.x_offset, 3+player.y_offset, 44+player.x_offset, 84+player.y_offset, colors[num])
+
     for y=1,20 do
       for x=1,10 do
-        spr(player.playfield[y][x], player.x_offset+4*x, player.y_offset+4*y, 0.5, 0.5)
+        local sprite = player.playfield[y][x]
+
+        if table_contains(player.lines_to_clear, y) then
+          local frame = player.clear % 3
+          if frame == 2 then
+            sprite = 18
+          elseif frame == 1 then
+            sprite = 17
+          else
+            sprite = 6
+          end
+        end
+
+        spr(sprite, player.x_offset+4*x, player.y_offset+4*y, 0.5, 0.5)
       end
     end
   end
