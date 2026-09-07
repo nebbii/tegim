@@ -55,6 +55,9 @@ function _init()
     init_player(1)
   }
 
+  start_insta = false
+  start_invis = false
+
   music(0)
 end
 
@@ -204,6 +207,10 @@ end
 function handle_gravity(player)
   player.lock = 0
   internal_gravity = get_level_gravity(player.level)
+  if player.insta then
+    internal_gravity = 5120
+  end
+
 
   if player.soft and internal_gravity < 256 then
     player.gravity += 1
@@ -476,10 +483,20 @@ function init_player(num)
 
     -- modes
 
-    history = {},
+    code = "",
     insta = false,
     invis = false
   }
+
+  if start_insta then
+    player.insta = true
+    start_insta = false
+  end
+
+  if start_invis then
+    player.invis = true
+    start_invis = false
+  end
 
   player.current = retrieve_initial_piece(player)
   player.next = retrieve_piece(player)
@@ -490,6 +507,8 @@ end
 function kill_player(player)
   player.delay = 80
   player.alive = false
+  player.start_insta = false
+  player.start_invis = false
   player.lspin = false -- doesn't poll otherwise until anim is done
 end
 
@@ -801,33 +820,37 @@ function handle_menu_input(player)
     players[player.num + 1] = init_player(player.num)
 
     player.lspin = false
+  else
+    player.lspin = false
   end
 
   if held_x and held_o then
     if left then
-      add(player.history, 0)
+      player.code = player.code .. '0'
     end
     if right then
-      add(player.history, 1)
+      player.code = player.code .. '1'
     end
     if up then
-      add(player.history, 2)
+      player.code = player.code .. '2'
     end
     if down then
-      add(player.history, 3)
+      player.code = player.code .. '3'
     end
 
-    if #player.history > 10 then
-      deli(player.history, 1)
+    if #player.code > 8 then
+      player.code = sub(player.code, 2, 9)
     end
 
-    printh('---')
-    local string = ""
-    for input in all(player.history) do
-      string = string .. ", " .. input
+    if player.code == "33333333" then
+      start_insta = true
+      printh("20g code active")
     end
-    printh(string)
-    printh('---')
+
+    if player.code == "02130213" then
+      start_invis = true
+      printh("invis code active")
+    end
   end
 
 end
