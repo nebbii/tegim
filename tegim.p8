@@ -123,6 +123,7 @@ function render_playfields()
 
     for y=1,20 do
       for x=1,10 do
+
         local sprite = player.playfield[y][x]
 
         if table_contains(player.lines_to_clear, y) then
@@ -133,6 +134,10 @@ function render_playfields()
             sprite = 17
           else
             sprite = 6
+          end
+        else
+          if player.invis then
+            sprite = 0
           end
         end
 
@@ -468,6 +473,12 @@ function init_player(num)
     soft = false,
 
     alive = true,
+
+    -- modes
+
+    history = {},
+    insta = false,
+    invis = false
   }
 
   player.current = retrieve_initial_piece(player)
@@ -775,21 +786,48 @@ end
 
 function handle_menu_input(player)
   -- movement
-  local left = btn(0, player.num)
-  local right = btn(1, player.num)
-  local up = btn(2, player.num)
-  local down = btn(3, player.num)
-  local x = btn(5, player.num)
-  local o = btn(4, player.num)
+  local left = btnp(0, player.num)
+  local right = btnp(1, player.num)
+  local up = btnp(2, player.num)
+  local down = btnp(3, player.num)
+  local x = btnp(5, player.num)
+  local o = btnp(4, player.num)
+  local held_x = btn(5, player.num)
+  local held_o = btn(4, player.num)
 
-  local history = {}
-
-  if x then
+  if held_x and not held_o then
     player.lspin = true
-  elseif player.lspin and not x then
+  elseif player.lspin and not held_x and not held_o then
     players[player.num + 1] = init_player(player.num)
 
     player.lspin = false
+  end
+
+  if held_x and held_o then
+    if left then
+      add(player.history, 0)
+    end
+    if right then
+      add(player.history, 1)
+    end
+    if up then
+      add(player.history, 2)
+    end
+    if down then
+      add(player.history, 3)
+    end
+
+    if #player.history > 10 then
+      deli(player.history, 1)
+    end
+
+    printh('---')
+    local string = ""
+    for input in all(player.history) do
+      string = string .. ", " .. input
+    end
+    printh(string)
+    printh('---')
   end
 
 end
