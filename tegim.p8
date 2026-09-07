@@ -2,7 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 43
 __lua__
 function _init()
-  three_button_spin = false
+  three_button_spin = true
   pal(15, 140, 1) -- more visible on crts
 
   pieces = {
