@@ -274,6 +274,8 @@ function clear_lines(player)
       add(temp, 0)
     end
     add(player.playfield, temp, 1)
+
+    player.level += 1
   end
 
   player.lines_to_clear = {}
