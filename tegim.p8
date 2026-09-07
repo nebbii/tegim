@@ -2,7 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 43
 __lua__
 function _init()
-  three_button_spin = false
+  three_button_spin = true
   pal(15, 140, 1) -- more visible on crts
 
   pieces = {
@@ -83,7 +83,7 @@ function _draw()
   render_status()
   render_previews()
   render_currents()
-  --render_debug()
+  render_debug()
 end
 
 -->8
@@ -347,7 +347,7 @@ function next_piece(player)
   --needs bag system
   -- grabs piece shown in preview
   player.current = player.next
-  player.next = flr(rnd(7)+1)
+  player.next = retrieve_piece(player)
   player.row = 1
   player.level += 1
   player.lock = 0
@@ -366,6 +366,28 @@ function next_piece(player)
   if is_any_tile_taken(player) then
     player.alive = false
   end
+end
+
+function retrieve_piece(player)
+  local next = flr(rnd(7)+1)
+
+  for i=1,4 do
+    if table_contains(player.history, next) then
+      next = flr(rnd(7)+1)
+    end
+  end
+
+  return next
+end
+
+function retrieve_initial_piece(player)
+  local next = flr(rnd(7)+1)
+
+  while next == 2 or next == 3 or next == 6 do
+    next = flr(rnd(7)+1)
+  end
+
+  return next
 end
 
 function place_piece(player)
@@ -396,11 +418,10 @@ function init_player(num)
   local x_offsets = {6, 74}
   local y_offsets = {28, 28}-- unused for now :thinking:
 
-  return {
+  local player = {
     num = num,
     playfield = init_playfield(),
-    next = flr(rnd(7)+1),
-    current = flr(rnd(7)+1),
+    history = {2, 2, 2, 2},
     column = 4,
     row = 1,
     level = 1,
@@ -424,6 +445,11 @@ function init_player(num)
 
     alive = true,
   }
+
+  player.current = retrieve_initial_piece(player)
+  player.next = retrieve_piece(player)
+
+  return player
 end
 
 function check_grounded(player)
