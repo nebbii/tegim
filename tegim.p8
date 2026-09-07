@@ -2,7 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 43
 __lua__
 function _init()
-  three_button_spin = false
+  three_button_spin = true
   pal(15, 140, 1) -- more visible on crts
 
   pieces = {
@@ -72,6 +72,8 @@ function _update60()
       else
         handle_gravity(player)
       end
+    else
+      handle_menu_input(player)
     end
   end
 end
@@ -107,12 +109,13 @@ end
 
 function render_playfields()
   for num, player in ipairs(players) do
-    local colors = {8, 11}
+    --local colors = {8, 11}
+    local color = flr(player.level / 100) + 1
 
-    line(3+player.x_offset, 3+player.y_offset, 44+player.x_offset, 3+player.y_offset, colors[num])
-    line(3+player.x_offset, 3+player.y_offset, 3+player.x_offset, 84+player.y_offset, colors[num])
-    line(3+player.x_offset, 84+player.y_offset, 44+player.x_offset, 84+player.y_offset, colors[num])
-    line(44+player.x_offset, 3+player.y_offset, 44+player.x_offset, 84+player.y_offset, colors[num])
+    line(3+player.x_offset, 3+player.y_offset, 44+player.x_offset, 3+player.y_offset, color)
+    line(3+player.x_offset, 3+player.y_offset, 3+player.x_offset, 84+player.y_offset, color)
+    line(3+player.x_offset, 84+player.y_offset, 44+player.x_offset, 84+player.y_offset, color)
+    line(44+player.x_offset, 3+player.y_offset, 44+player.x_offset, 84+player.y_offset, color)
 
     for y=1,20 do
       for x=1,10 do
@@ -351,7 +354,6 @@ function next_piece(player)
   player.current = player.next
   player.next = retrieve_piece(player)
   player.row = 1
-  player.level += 1
   player.lock = 0
 
   -- irs always prioritizes a over b
@@ -367,6 +369,10 @@ function next_piece(player)
 
   if is_any_tile_taken(player) then
     player.alive = false
+  end
+
+  if (player.level + 1) % 100 != 0 then
+    player.level += 1
   end
 end
 
@@ -624,10 +630,8 @@ function center_column_rule(player, center)
       local by = player.row + y
 
       if is_tile_taken(player.playfield, bx, by) and not x == 1 then
-        --printh('center column rule: passed on ' .. x .. ', ' .. y)
         return true
       elseif is_tile_taken(player.playfield, bx, by) and x == 1 then
-        --printh('center column rule: rejected on ' .. x .. ', ' .. y)
         return false
       end
     end
@@ -738,6 +742,20 @@ function handle_game_input(player)
     player.rspin = true
   else
     player.rspin = false
+  end
+end
+
+function handle_menu_input(player)
+  -- movement
+  local left = btn(0, player.num)
+  local right = btn(1, player.num)
+  local up = btn(2, player.num)
+  local down = btn(3, player.num)
+  local x = btn(5, player.num)
+  local o = btn(4, player.num)
+
+  if x then
+    players[player.num + 1] = init_player(player.num)
   end
 end
 
