@@ -73,7 +73,11 @@ function _update60()
         handle_gravity(player)
       end
     else
-      handle_menu_input(player)
+      if player.delay >= 0 then
+        handle_death(player)
+      else
+        handle_menu_input(player)
+      end
     end
   end
 end
@@ -147,16 +151,14 @@ function render_status()
 end
 
 function render_currents()
-  if players[1].are == -1 and players[1].clear <= 0 then
-    if players[1].lock == 29 then
-      draw_piece(players[1].current, players[1].rotation, 6+4*players[1].column, 28+4*players[1].row, 18)
-    else
-      draw_piece(players[1].current, players[1].rotation, 6+4*players[1].column, 28+4*players[1].row)
+  for num, player in ipairs(players) do
+    if player.are == -1 and player.clear <= 0 and player.delay < 0 then
+      if player.lock == 29 then
+        draw_piece(player.current, player.rotation, player.x_offset+4*player.column, player.y_offset+4*player.row, 18)
+      else
+        draw_piece(player.current, player.rotation, player.x_offset+4*player.column, player.y_offset+4*player.row)
+      end
     end
-  end
-
-  if players[2].are == -1 and players[2].clear <= 0 then
-    draw_piece(players[2].current, players[2].rotation, 74+4*players[2].column, 28+4*players[2].row)
   end
 end
 
@@ -247,6 +249,20 @@ function handle_clear(player)
 
   if player.clear == 20 then
     clear_lines(player)
+  end
+end
+
+function handle_death(player)
+  if player.delay > 0 then
+    if player.delay % 2 == 0 and player.delay > 0 then
+      for column=1,10 do
+        if player.playfield[player.delay / 2][column] != 0 then
+          player.playfield[player.delay / 2][column] = 18
+        end
+      end
+    end
+
+    player.delay -= 1
   end
 end
 
@@ -368,7 +384,8 @@ function next_piece(player)
   player.column = 4
 
   if is_any_tile_taken(player) then
-    player.alive = false
+    place_piece(player)
+    kill_player(player)
   end
 
   if (player.level + 1) % 100 != 0 then
@@ -444,6 +461,7 @@ function init_player(num)
     das = 0,
     lock = 0,
     clear = 0,
+    delay = -1,
 
     rotation = 1,
     lspin = false,
@@ -458,6 +476,11 @@ function init_player(num)
   player.next = retrieve_piece(player)
 
   return player
+end
+
+function kill_player(player)
+  player.delay = 40
+  player.alive = false
 end
 
 function check_grounded(player)
@@ -754,9 +777,16 @@ function handle_menu_input(player)
   local x = btn(5, player.num)
   local o = btn(4, player.num)
 
+  local history = {}
+
   if x then
+    player.lspin = true
+  elseif player.lspin and not x then
     players[player.num + 1] = init_player(player.num)
+
+    player.lspin = false
   end
+
 end
 
 __gfx__
