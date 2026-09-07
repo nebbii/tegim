@@ -117,6 +117,10 @@ function table_contains(tbl, x)
   return found
 end
 
+function rnd32()
+  return rnd() << 16 | rnd()
+end
+
 function render_playfields()
   for num, player in ipairs(players) do
     --local colors = {8, 11}
@@ -142,7 +146,7 @@ function render_playfields()
             sprite = 6
           end
         else
-          if player.invis then
+          if player.invis and player.alive then
             sprite = 0
           end
         end
@@ -159,6 +163,13 @@ function render_status()
 
   print(players[2].level, 65, 92, 13)
   print(ceil(players[2].level / 100) * 100, 65, 102, 13)
+
+  if start_invis then
+    print('invis', 20, 2, 11)
+  end
+  if start_insta then
+    print('20G', 50, 2, 11)
+  end
 end
 
 function render_currents()
@@ -412,6 +423,8 @@ function retrieve_piece(player)
   for i=1,4 do
     if table_contains(player.history, next) then
       next = flr(rnd(7)+1)
+    else
+      return next
     end
   end
 
@@ -850,7 +863,7 @@ function handle_menu_input(player)
       printh("20g code active")
     end
 
-    if player.code == "02130213" then
+    if player.code == "031130" then
       start_invis = true
       printh("invis code active")
     end
