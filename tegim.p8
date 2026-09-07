@@ -2,7 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 43
 __lua__
 function _init()
-  three_button_spin = true
+  three_button_spin = false
   pal(15, 140, 1) -- more visible on crts
 
   pieces = {
@@ -54,6 +54,9 @@ function _init()
     init_player(0),
     init_player(1)
   }
+  for num, player in ipairs(players) do
+    player.alive = false
+  end
 
   start_insta = false
   start_invis = false
@@ -160,7 +163,7 @@ end
 
 function render_currents()
   for num, player in ipairs(players) do
-    if player.are == -1 and player.clear <= 0 and player.delay < 0 then
+    if player.are == -1 and player.clear <= 0 and player.delay < 0 and player.alive then
       if player.lock == 29 then
         draw_piece(player.current, player.rotation, player.x_offset+4*player.column, player.y_offset+4*player.row, 18)
       else
