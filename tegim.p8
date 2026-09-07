@@ -423,11 +423,11 @@ function retrieve_piece(player)
   for i=1,4 do
     if table_contains(player.history, next) then
       next = flr(rnd(7)+1)
-    else
-      return next
     end
   end
 
+  deli(player.history, 1)
+  add(player.history, next)
   return next
 end
 
