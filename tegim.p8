@@ -73,7 +73,7 @@ function _update60()
         handle_gravity(player)
       end
     else
-      if player.delay >= 0 then
+      if player.delay > 0 then
         handle_death(player)
       else
         handle_menu_input(player)
@@ -254,10 +254,10 @@ end
 
 function handle_death(player)
   if player.delay > 0 then
-    if player.delay % 2 == 0 and player.delay > 0 then
+    if player.delay % 4 == 0 and player.delay > 0 then
       for column=1,10 do
-        if player.playfield[player.delay / 2][column] != 0 then
-          player.playfield[player.delay / 2][column] = 18
+        if player.playfield[player.delay / 4][column] != 0 then
+          player.playfield[player.delay / 4][column] = 18
         end
       end
     end
@@ -294,7 +294,7 @@ function clear_lines(player)
     end
     add(player.playfield, temp, 1)
 
-    player.level += 1
+    increase_level(player, true)
   end
 
   player.lines_to_clear = {}
@@ -388,9 +388,7 @@ function next_piece(player)
     kill_player(player)
   end
 
-  if (player.level + 1) % 100 != 0 then
-    player.level += 1
-  end
+  increase_level(player, false)
 end
 
 function retrieve_piece(player)
@@ -479,8 +477,15 @@ function init_player(num)
 end
 
 function kill_player(player)
-  player.delay = 40
+  player.delay = 80
   player.alive = false
+  player.lspin = false -- doesn't poll otherwise until anim is done
+end
+
+function increase_level(player, clear)
+  if (player.level + 1) % 100 != 0 or clear then
+    player.level += 1
+  end
 end
 
 function check_grounded(player)
