@@ -165,10 +165,10 @@ end
 
 function render_status()
   print(players[1].level, 52, 92, 13)
-  print(ceil(players[1].level / 100) * 100, 52, 102, 13)
+  print(min(999, ceil(players[1].level / 100) * 100), 52, 102, 13)
 
   print(players[2].level, 65, 92, 13)
-  print(ceil(players[2].level / 100) * 100, 65, 102, 13)
+  print(min(999, ceil(players[2].level / 100) * 100), 65, 102, 13)
 
   if start_invis then
     print('invis', 20, 2, 11)
@@ -250,7 +250,6 @@ function draw_timer(player)
   if minutes < 10 then minutes = "0" .. minutes end
   if seconds < 10 then seconds = "0" .. seconds end
   print(minutes .. ":" .. seconds, player.x_offset + 20, player.y_offset + 86, color)
-  print(timer, player.x_offset + 60, player.y_offset + 86, color)
 end
 
 -->8
@@ -262,7 +261,6 @@ function handle_gravity(player)
   if player.insta then
     internal_gravity = 5120
   end
-
 
   if player.soft and internal_gravity < 256 then
     player.gravity += 1
@@ -359,7 +357,6 @@ function clear_lines(player)
     add(player.playfield, temp, 1)
 
     increase_level(player, true)
-    check_win(player)
   end
 
   player.lines_to_clear = {}
@@ -543,7 +540,6 @@ function init_player(num)
     win = false,
 
     -- modes
-
     code = "",
     insta = false,
     invis = false
@@ -574,7 +570,9 @@ function kill_player(player)
 end
 
 function increase_level(player, cleared)
-  if (player.level + 1) % 100 != 0 or cleared then
+  if player.level == 999 and cleared then
+    player.win = true
+  elseif (player.level + 1) % 100 != 0 or cleared then
     player.level += 1
   end
 end
@@ -617,12 +615,6 @@ function check_walls(player, move)
   end
 
   return false
-end
-
-function check_win(player)
-  if player.level >= 999 then
-    player.win = true
-  end
 end
 
 function move_piece(player, direction)
