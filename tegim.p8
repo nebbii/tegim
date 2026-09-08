@@ -69,6 +69,10 @@ function _update60()
     if player.alive then
       handle_game_input(player)
 
+      if not player.win then
+        player.timer += 1
+      end
+
       if player.clear > 0 then
         handle_clear(player)
       elseif player.are >= 0 then
@@ -76,9 +80,8 @@ function _update60()
       elseif check_grounded(player) then
         handle_lock(player)
       else
-        handle_gravity(player)
+        --handle_gravity(player)
       end
-      player.timer += 1
     else
       if player.delay > 0 then
         handle_death(player)
@@ -220,9 +223,20 @@ end
 
 function draw_timer(player)
   local timer = player.timer
+
   local seconds = flr(player.timer / 60) % 60
   local minutes = flr((timer - (seconds * 60)) / 60 / 60)
-  print(minutes .. ":" .. seconds, player.x_offset + 30, player.y_offset + 86, 13)
+
+  local color = 13
+  if player.win then
+    color = 9
+  elseif not player.alive then
+    color = 1
+  end
+
+  if minutes < 10 then minutes = "0" .. minutes end
+  if seconds < 10 then seconds = "0" .. seconds end
+  print(minutes .. ":" .. seconds, player.x_offset + 20, player.y_offset + 86, color)
 end
 
 -->8
@@ -507,6 +521,7 @@ function init_player(num)
     soft = false,
 
     alive = true,
+    win = false,
 
     -- modes
 
@@ -539,8 +554,8 @@ function kill_player(player)
   player.lspin = false -- doesn't poll otherwise until anim is done
 end
 
-function increase_level(player, clear)
-  if (player.level + 1) % 100 != 0 or clear then
+function increase_level(player, cleared)
+  if (player.level + 1) % 100 != 0 or cleared then
     player.level += 1
   end
 end
