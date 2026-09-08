@@ -70,7 +70,7 @@ function _update60()
       handle_game_input(player)
 
       if not player.win then
-        player.timer += 1
+        handle_timer(player)
       end
 
       if player.clear > 0 then
@@ -80,7 +80,7 @@ function _update60()
       elseif check_grounded(player) then
         handle_lock(player)
       else
-        --handle_gravity(player)
+        handle_gravity(player)
       end
     else
       if player.delay > 0 then
@@ -221,22 +221,36 @@ function draw_piece(piece, rotation, x, y, color)
   end
 end
 
+function handle_timer(player)
+  player.milli += 1
+
+  if player.milli > 0 and player.milli % 60 == 0 then
+    player.milli -= 60
+    player.seconds += 1
+  end
+
+  if player.seconds > 0 and player.seconds % 60 == 0 then
+    player.seconds -= 60
+    player.minutes += 1
+  end
+end
+
 function draw_timer(player)
-  local timer = player.timer
-
-  local seconds = flr(player.timer / 60) % 60
-  local minutes = flr((timer - (seconds * 60)) / 60 / 60)
-
   local color = 13
+
   if player.win then
     color = 9
   elseif not player.alive then
     color = 1
   end
 
+  local seconds = player.seconds
+  local minutes = player.minutes
+
   if minutes < 10 then minutes = "0" .. minutes end
   if seconds < 10 then seconds = "0" .. seconds end
   print(minutes .. ":" .. seconds, player.x_offset + 20, player.y_offset + 86, color)
+  print(timer, player.x_offset + 60, player.y_offset + 86, color)
 end
 
 -->8
@@ -345,6 +359,7 @@ function clear_lines(player)
     add(player.playfield, temp, 1)
 
     increase_level(player, true)
+    check_win(player)
   end
 
   player.lines_to_clear = {}
@@ -512,7 +527,11 @@ function init_player(num)
     lock = 0,
     clear = 0,
     delay = -1,
-    timer = 0,
+
+    -- timer
+    milli = 0,
+    seconds = 0,
+    minutes = 0,
 
     rotation = 1,
     lspin = false,
@@ -598,6 +617,12 @@ function check_walls(player, move)
   end
 
   return false
+end
+
+function check_win(player)
+  if player.level >= 999 then
+    player.win = true
+  end
 end
 
 function move_piece(player, direction)
