@@ -78,6 +78,7 @@ function _update60()
       else
         handle_gravity(player)
       end
+      player.timer += 1
     else
       if player.delay > 0 then
         handle_death(player)
@@ -154,6 +155,8 @@ function render_playfields()
         spr(sprite, player.x_offset+4*x, player.y_offset+4*y, 0.5, 0.5)
       end
     end
+
+    draw_timer(player)
   end
 end
 
@@ -213,6 +216,13 @@ function draw_piece(piece, rotation, x, y, color)
       spr(color, x+block[1]*4, y+block[2]*4, 0.5, 0.5)
     end
   end
+end
+
+function draw_timer(player)
+  local timer = player.timer
+  local seconds = flr(player.timer / 60) % 60
+  local minutes = flr((timer - (seconds * 60)) / 60 / 60)
+  print(minutes .. ":" .. seconds, player.x_offset + 30, player.y_offset + 86, 13)
 end
 
 -->8
@@ -488,6 +498,7 @@ function init_player(num)
     lock = 0,
     clear = 0,
     delay = -1,
+    timer = 0,
 
     rotation = 1,
     lspin = false,
