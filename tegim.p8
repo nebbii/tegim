@@ -160,6 +160,10 @@ function render_playfields()
     end
 
     draw_timer(player)
+
+    if player.draw_splits then
+      draw_splits(player)
+    end
   end
 end
 
@@ -250,6 +254,12 @@ function draw_timer(player)
   if minutes < 10 then minutes = "0" .. minutes end
   if seconds < 10 then seconds = "0" .. seconds end
   print(minutes .. ":" .. seconds, player.x_offset + 20, player.y_offset + 86, color)
+end
+
+function draw_splits(player)
+  for index, split in pairs(player.splits) do
+    print((index-1) * 100 .. ": " .. split, player.x_offset + 5, player.y_offset + (8 * index) - 3, 13)
+  end
 end
 
 -->8
@@ -539,6 +549,9 @@ function init_player(num)
     alive = true,
     win = false,
 
+    splits = {},
+    draw_splits = false,
+
     -- modes
     code = "",
     insta = false,
@@ -571,10 +584,25 @@ end
 
 function increase_level(player, cleared)
   if player.level == 999 and cleared then
+    save_split(player)
     player.win = true
   elseif (player.level + 1) % 100 != 0 or cleared then
     player.level += 1
   end
+
+  if player.level % 100 == 0 and cleared then
+    save_split(player)
+  end
+end
+
+function save_split(player)
+  local seconds = player.seconds
+  local minutes = player.minutes
+
+  if minutes < 10 then minutes = "0" .. minutes end
+  if seconds < 10 then seconds = "0" .. seconds end
+
+  add(player.splits, minutes .. ":" .. seconds)
 end
 
 function check_grounded(player)
@@ -881,6 +909,14 @@ function handle_menu_input(player)
     player.lspin = false
   else
     player.lspin = false
+  end
+
+  if o and #player.splits > 0 then
+    if player.draw_splits then
+      player.draw_splits = false
+    else
+      player.draw_splits = true
+    end
   end
 
   if held_x and held_o then
