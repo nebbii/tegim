@@ -113,7 +113,7 @@ function render_previews()
     offset = 17
   end
 
-  draw_piece(players[1].next, 1, 24, offset)
+  draw_piece(players[1].next, 1, 20, offset)
 
   if players[2].next == 6 then
     offset = 21
@@ -121,7 +121,7 @@ function render_previews()
     offset = 17
   end
 
-  draw_piece(players[2].next, 1, 90, offset)
+  draw_piece(players[2].next, 1, 92, offset)
 end
 
 -- snippet from Ben Tasker's blog: https://snippets.bentasker.co.uk/posts/lua/check-if-value-exists-in-table.html
@@ -258,8 +258,6 @@ function draw_timer(player)
 
   if player.win then
     color = 9
-  elseif not player.alive then
-    color = 1
   end
 
   local seconds = player.seconds
@@ -272,7 +270,7 @@ end
 
 function draw_splits(player)
   for index, split in pairs(player.splits) do
-    print((index-1) * 100 .. ": " .. split, player.x_offset + 5, player.y_offset + (8 * index) - 3, 13)
+    print((index-1) * 100 .. ": " .. split, player.x_offset + 5, player.y_offset + (8 * index) - 3, 9)
   end
 end
 
