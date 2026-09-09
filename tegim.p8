@@ -151,7 +151,7 @@ function render_playfields()
           end
         else
           if player.invis and player.alive then
-            sprite = 16
+            sprite = 0
           end
         end
 
