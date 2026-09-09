@@ -319,7 +319,7 @@ function handle_clear(player)
     player.clear -= 1
   end
 
-  if player.clear == 20 then
+  if player.clear == 10 then
     clear_lines(player)
   end
 end
@@ -1099,4 +1099,3 @@ __music__
 00 25262712
 00 28292a12
 02 01021a0a
-
