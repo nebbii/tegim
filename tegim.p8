@@ -135,7 +135,7 @@ function render_playfields()
     line(3+player.x_offset, 84+player.y_offset, 44+player.x_offset, 84+player.y_offset, color)
     line(44+player.x_offset, 3+player.y_offset, 44+player.x_offset, 84+player.y_offset, color)
 
-    for y=1,20 do
+    for y=1,22 do
       for x=1,10 do
 
         local sprite = player.playfield[y][x]
@@ -151,11 +151,11 @@ function render_playfields()
           end
         else
           if player.invis and player.alive then
-            sprite = 0
+            sprite = 16
           end
         end
 
-        spr(sprite, player.x_offset+4*x, player.y_offset+4*y, 0.5, 0.5)
+        spr(sprite, player.x_offset+4*x, player.y_offset+(4*y)-8, 0.5, 0.5)
       end
     end
 
@@ -186,9 +186,9 @@ function render_currents()
   for num, player in ipairs(players) do
     if player.are == -1 and player.clear <= 0 and player.delay < 0 and player.alive then
       if player.lock == 29 then
-        draw_piece(player.current, player.rotation, player.x_offset+4*player.column, player.y_offset+4*player.row, 18)
+        draw_piece(player.current, player.rotation, player.x_offset+4*player.column, player.y_offset+4*player.row-8, 18)
       else
-        draw_piece(player.current, player.rotation, player.x_offset+4*player.column, player.y_offset+4*player.row)
+        draw_piece(player.current, player.rotation, player.x_offset+4*player.column, player.y_offset+4*player.row-8)
       end
     end
   end
@@ -341,7 +341,7 @@ end
 function detect_lines(player)
   clears = {}
 
-	for y=1,20 do
+	for y=1,22 do
     count = 0
 
 		for x=1,10 do
@@ -441,7 +441,7 @@ function next_piece(player)
   -- grabs piece shown in preview
   player.current = player.next
   player.next = retrieve_piece(player)
-  player.row = 1
+  player.row = 2
   player.lock = 0
 
   -- irs always prioritizes a over b
@@ -501,7 +501,7 @@ end
 function init_playfield()
   local pf = {}
 
-  for row=1,20 do
+  for row=1,22 do
     pf[row]={}
     for column=1,10 do
       pf[row][column]=0
@@ -520,7 +520,7 @@ function init_player(num)
     playfield = init_playfield(),
     history = {2, 2, 2, 2},
     column = 4,
-    row = 1,
+    row = 2,
     level = 1,
     gravity = 0,
     lines_to_clear = {},
@@ -952,7 +952,7 @@ end
 
 __gfx__
 00000000666600006666000066660000666600006666000066660000666600000000000011111111000000000000000000000000000000000000000000000000
-00100000688800006bbb0000622200006fff0000699900006aaa00006ccc00000000000010000001000000000000000000000000000000000000000000000000
+00000000688800006bbb0000622200006fff0000699900006aaa00006ccc00000000000010000001000000000000000000000000000000000000000000000000
 00000000688800006bbb0000622200006fff0000699900006aaa00006ccc00000000000010000001000000000000000000000000000000000000000000000000
 00000000688800006bbb0000622200006fff0000699900006aaa00006ccc00000000000010000001000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000010000001000000000000000000000000000000000000000000000000
@@ -1099,3 +1099,4 @@ __music__
 00 25262712
 00 28292a12
 02 01021a0a
+
