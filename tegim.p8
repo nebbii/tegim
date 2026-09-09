@@ -258,7 +258,14 @@ end
 
 function draw_splits(player)
   for index, split in pairs(player.splits) do
-    print((index-1) * 100 .. ": " .. split, player.x_offset + 5, player.y_offset + (8 * index) - 3, 13)
+    local minutes = split[1]
+    local seconds = split[2]
+    if minutes < 10 then minutes = "0" .. minutes end
+    if seconds < 10 then seconds = "0" .. seconds end
+
+    local split = minutes .. ":" .. seconds
+
+    print(min(index * 100, 999) .. ": " .. split, player.x_offset + 5, player.y_offset + (8 * index) - 3, 13)
   end
 end
 
@@ -521,7 +528,7 @@ function init_player(num)
     history = {2, 2, 2, 2},
     column = 4,
     row = 1,
-    level = 1,
+    level = 99,
     gravity = 0,
     lines_to_clear = {},
 
@@ -599,10 +606,15 @@ function save_split(player)
   local seconds = player.seconds
   local minutes = player.minutes
 
-  if minutes < 10 then minutes = "0" .. minutes end
-  if seconds < 10 then seconds = "0" .. seconds end
+  local last_seconds = 0
+  local last_minutes = 0
 
-  add(player.splits, minutes .. ":" .. seconds)
+  for index, split in pairs(player.splits) do
+    last_seconds += split[1]
+    last_minutes += split[2]
+  end
+
+  add(player.splits, {minutes - last_minutes, seconds - last_seconds})
 end
 
 function check_grounded(player)
