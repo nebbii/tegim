@@ -106,8 +106,22 @@ end
 -- rendering
 
 function render_previews()
-  draw_piece(players[1].next, 1, 24, 16)
-  draw_piece(players[2].next, 1, 90, 16)
+  local offset = 17
+  if players[1].next == 6 then
+    offset = 21
+  else
+    offset = 17
+  end
+
+  draw_piece(players[1].next, 1, 24, offset)
+
+  if players[2].next == 6 then
+    offset = 21
+  else
+    offset = 17
+  end
+
+  draw_piece(players[2].next, 1, 90, offset)
 end
 
 -- snippet from Ben Tasker's blog: https://snippets.bentasker.co.uk/posts/lua/check-if-value-exists-in-table.html
@@ -1289,4 +1303,3 @@ __music__
 00 25262712
 00 28292a12
 02 01021a0a
-
