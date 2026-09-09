@@ -67,8 +67,6 @@ end
 function _update60()
   for num, player in ipairs(players) do
     if player.alive then
-      handle_game_input(player)
-
       if not player.win then
         handle_timer(player)
       end
@@ -82,6 +80,8 @@ function _update60()
       else
         handle_gravity(player)
       end
+
+      handle_game_input(player)
     else
       if player.delay > 0 then
         handle_death(player)
