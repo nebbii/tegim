@@ -75,6 +75,7 @@ function _update60()
         handle_clear(player)
       elseif player.are >= 0 then
         handle_spawn(player)
+        handle_gravity(player)
       elseif check_grounded(player) then
         handle_lock(player)
       else
@@ -284,7 +285,7 @@ function handle_gravity(player)
     internal_gravity = 5120
   end
 
-  if player.soft and internal_gravity < 256 then
+  if player.are < 0 and player.soft and internal_gravity < 256 then
     player.gravity += 1
   else
     player.gravity += internal_gravity / 256
@@ -951,12 +952,10 @@ function handle_menu_input(player)
 
     if player.code == "33333333" then
       start_insta = true
-      printh("20g code active")
     end
 
     if player.code == "031130" then
       start_invis = true
-      printh("invis code active")
     end
   end
 
