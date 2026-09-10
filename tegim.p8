@@ -659,15 +659,19 @@ function check_walls(player, move)
 end
 
 function move_piece(player, direction)
+  if player.are >= 0 then return false end
+
   if direction == 0 then
     if not check_walls(player, -1) then
       player.column -= 1
+      return true
     end
   end
 
   if direction == 1 then
     if not check_walls(player, 1) then
       player.column += 1
+      return true
     end
   end
 end
