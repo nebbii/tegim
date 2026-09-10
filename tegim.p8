@@ -295,6 +295,7 @@ function handle_gravity(player)
 
   if player.are < 0 and player.soft and internal_gravity < 256 then
     player.gravity += 1
+    player.soft_frames += 1
   else
     player.gravity += internal_gravity / 256
   end
@@ -321,8 +322,11 @@ function handle_lock(player)
     local lines_to_clear = detect_lines(player)
 
     if #lines_to_clear > 0 then
+      increase_score(player, #lines_to_clear)
       player.lines_to_clear = lines_to_clear
       player.clear = 41
+    else
+      player.combo = 1
     end
   end
 end
@@ -457,6 +461,46 @@ function get_level_gravity(level)
   return 5120
 end
 
+function get_grade(player)
+  if score < 400 then
+    return '9'
+  elseif score < 800 then
+    return '8'
+  elseif score < 1400 then
+    return '7'
+  elseif score < 2000 then
+    return '6'
+  elseif score < 3500 then
+    return '5'
+  elseif score < 5500 then
+    return '4'
+  elseif score < 8000 then
+    return '3'
+  elseif score < 12000 then
+    return '2'
+  elseif score < 16000 then
+    return '1'
+  elseif score < 22000 then
+    return 'S1'
+  elseif score < 30000 then
+    return 'S2'
+  elseif score < 40000 then
+    return 'S3'
+  elseif score < 52000 then
+    return 'S4'
+  elseif score < 66000 then
+    return 'S5'
+  elseif score < 82000 then
+    return 'S6'
+  elseif score < 100000 then
+    return 'S7'
+  elseif score < 120000 then
+    return 'S8'
+  end
+
+  return 'S9'
+end
+
 function next_piece(player)
   --needs bag system
   -- grabs piece shown in preview
@@ -464,6 +508,7 @@ function next_piece(player)
   player.next = retrieve_piece(player)
   player.row = 2
   player.lock = 0
+  player.soft_frames = 0
 
   -- irs always prioritizes a over b
   if player.lspin or player.l2spin then
@@ -566,10 +611,15 @@ function init_player(num)
     lspin = false,
     l2spin = false,
     rspin = false,
+
     soft = false,
+    soft_frames = 0,
 
     alive = true,
     win = false,
+    score = 0,
+    combo = 1,
+    bravo = 1, -- needs to be implemented
 
     splits = {},
     draw_splits = false,
@@ -615,6 +665,15 @@ function increase_level(player, cleared)
   if player.level % 100 == 0 and cleared then
     save_split(player)
   end
+end
+
+function increase_score(player, line_amount)
+  -- from harddrop:
+  -- Score = ((Level + Lines)/4 + Soft) x Lines x Combo x Bravo
+  --  https://harddrop.com/wiki/Tetris_The_Grand_Master
+  formula = ((player.level + line_amount)/4 + player.soft_frames) * line_amount * player.combo * player.bravo
+
+  player.score += formula
 end
 
 function save_split(player)
