@@ -85,9 +85,9 @@ function _update60()
     else
       if player.delay > 0 then
         handle_death(player)
-      else
-        handle_menu_input(player)
       end
+
+      handle_menu_input(player)
     end
   end
 end
@@ -915,7 +915,7 @@ function handle_menu_input(player)
 
   if held_x and not held_o then
     player.lspin = true
-  elseif player.lspin and not held_x and not held_o then
+  elseif player.lspin and not held_x and not held_o and player.delay <= 0 then
     players[player.num + 1] = init_player(player.num)
 
     player.lspin = false
