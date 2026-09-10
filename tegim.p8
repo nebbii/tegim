@@ -271,7 +271,7 @@ end
 
 function draw_splits(player)
   for index, split in pairs(player.splits) do
-    print((index-1) * 100 .. ": " .. split, player.x_offset + 5, player.y_offset + (8 * index) - 3, 9)
+    print((index-1) * 100 .. ": " .. split, player.x_offset + 5, player.y_offset + (8 * index) - 3, 8)
   end
 end
 
