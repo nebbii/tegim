@@ -67,22 +67,26 @@ end
 function _update60()
   for num, player in ipairs(players) do
     if player.alive then
-      if not player.win then
-        handle_timer(player)
-      end
-
-      if player.clear > 0 then
-        handle_clear(player)
-      elseif player.are >= 0 then
-        handle_spawn(player)
-        handle_gravity(player)
-      elseif check_grounded(player) then
-        handle_lock(player)
+      if player.countdown > 0 then
+        player.countdown -= 1
       else
-        handle_gravity(player)
-      end
+        if not player.win then
+          handle_timer(player)
+        end
 
-      handle_game_input(player)
+        if player.clear > 0 then
+          handle_clear(player)
+        elseif player.are >= 0 then
+          handle_spawn(player)
+          handle_gravity(player)
+        elseif check_grounded(player) then
+          handle_lock(player)
+        else
+          handle_gravity(player)
+        end
+
+        handle_game_input(player)
+      end
     else
       if player.delay > 0 then
         handle_death(player)
@@ -172,6 +176,10 @@ function render_playfields()
 
         spr(sprite, player.x_offset+4*x, player.y_offset+(4*y)-8, 0.5, 0.5)
       end
+    end
+
+    if player.alive and player.countdown > 0 then
+      print("READY", player.x_offset+14, player.y_offset+40, 7)
     end
 
     draw_timer(player)
@@ -549,6 +557,7 @@ function init_player(num)
     delay = -1,
 
     -- timer
+    countdown = 60,
     milli = 0,
     seconds = 0,
     minutes = 0,
