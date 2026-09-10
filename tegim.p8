@@ -587,7 +587,7 @@ function init_player(num)
 end
 
 function kill_player(player)
-  player.delay = 80
+  player.delay = 88
   player.alive = false
   player.start_insta = false
   player.start_invis = false
