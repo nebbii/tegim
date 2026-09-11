@@ -182,6 +182,13 @@ function render_playfields()
       print("READY", player.x_offset+14, player.y_offset+40, 7)
     end
 
+    if player.start_invis then
+      print('invis', 20, 2, 11)
+    end
+    if player.start_insta then
+      print('20G', 50, 2, 11)
+    end
+
     draw_timer(player)
 
     if player.draw_splits then
@@ -196,13 +203,6 @@ function render_status()
 
   print(players[2].level, 65, 92, 13)
   print(min(999, ceil(players[2].level / 100) * 100), 65, 102, 13)
-
-  if start_invis then
-    print('invis', 20, 2, 11)
-  end
-  if start_insta then
-    print('20G', 50, 2, 11)
-  end
 end
 
 function render_currents()
@@ -577,7 +577,7 @@ function init_playfield()
   return pf
 end
 
-function init_player(num)
+function init_player(num, existing_player)
   local x_offsets = {4, 76}
   local y_offsets = {32, 32}-- unused for now :thinking:
 
@@ -627,17 +627,19 @@ function init_player(num)
     -- modes
     code = "",
     insta = false,
-    invis = false
+    invis = false,
+    start_insta = false,
+    start_invis = false
   }
 
-  if start_insta then
-    player.insta = true
-    start_insta = false
-  end
+  if existing_player != nil then
+    if existing_player.start_insta then
+      player.insta = true
+    end
 
-  if start_invis then
-    player.invis = true
-    start_invis = false
+    if existing_player.start_invis then
+      player.invis = true
+    end
   end
 
   player.current = retrieve_initial_piece(player)
@@ -989,7 +991,7 @@ function handle_menu_input(player)
   if held_x and not held_o then
     player.lspin = true
   elseif player.lspin and not held_x and not held_o and player.delay <= 0 then
-    players[player.num + 1] = init_player(player.num)
+    players[player.num + 1] = init_player(player.num, player)
 
     player.lspin = false
   else
@@ -1023,11 +1025,11 @@ function handle_menu_input(player)
     end
 
     if player.code == "33333333" then
-      start_insta = true
+      player.start_insta = true
     end
 
     if player.code == "031130" then
-      start_invis = true
+      player.start_invis = true
     end
   end
 
