@@ -202,13 +202,13 @@ function render_status()
   print(min(999, ceil(players[1].level / 100) * 100), 52, 102, 13)
 
   print(get_total_score(players[1]), players[1].x_offset + 18, players[1].y_offset-16, 7)
-  print(get_grade(players[1].score), players[1].x_offset + 50, players[1].y_offset+6, 7)
+  print(get_grade(players[1].score, players[1].score_k), players[1].x_offset + 50, players[1].y_offset+6, 7)
 
   print(players[2].level, 65, 92, 13)
   print(min(999, ceil(players[2].level / 100) * 100), 65, 102, 13)
 
   print(get_total_score(players[2]), players[2].x_offset + 8, players[2].y_offset-16, 7)
-  print(get_grade(players[2].score), players[2].x_offset - 8, players[2].y_offset+6, 7)
+  print(get_grade(players[2].score, players[2].score_k), players[2].x_offset - 8, players[2].y_offset+6, 7)
 end
 
 function render_currents()
@@ -493,40 +493,40 @@ function get_level_gravity(level)
   return 5120
 end
 
-function get_grade(score)
-  if score < 400 then
+function get_grade(score, score_k)
+  if score_k == 0 and score < 400 then
     return '9'
-  elseif score < 800 then
+  elseif score_k == 0 and score < 800 then
     return '8'
-  elseif score < 1400 then
+  elseif score_k < 1 or (score_k < 1 and score < 400) then
     return '7'
-  elseif score < 2000 then
+  elseif score_k < 2 then
     return '6'
-  elseif score < 3500 then
+  elseif score_k < 3 or (score_k < 3 and score < 500) then
     return '5'
-  elseif score < 5500 then
+  elseif score_k < 5 or (score_k < 5 and score < 500) then
     return '4'
-  elseif score < 8000 then
+  elseif score_k < 8 then
     return '3'
-  elseif score < 12000 then
+  elseif score_k < 12 then
     return '2'
-  elseif score < 16000 then
+  elseif score_k < 16 then
     return '1'
-  elseif score < 22000 then
+  elseif score_k < 22 then
     return 'S1'
-  elseif score < 30000 then
+  elseif score_k < 30 then
     return 'S2'
-  elseif score < 40000 then
+  elseif score_k < 40 then
     return 'S3'
-  elseif score < 52000 then
+  elseif score_k < 52 then
     return 'S4'
-  elseif score < 66000 then
+  elseif score_k < 66 then
     return 'S5'
-  elseif score < 82000 then
+  elseif score_k < 82 then
     return 'S6'
-  elseif score < 100000 then
+  elseif score_k < 100 then
     return 'S7'
-  elseif score < 120000 then
+  elseif score_k < 120 then
     return 'S8'
   end
 
