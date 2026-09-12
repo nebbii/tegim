@@ -201,12 +201,14 @@ function render_status()
   print(players[1].level, 52, 92, 13)
   print(min(999, ceil(players[1].level / 100) * 100), 52, 102, 13)
 
-  print(players[1].score, players[1].x_offset + 18, players[1].y_offset-15, 7)
+  print(get_total_score(players[1]), players[1].x_offset + 18, players[1].y_offset-16, 7)
+  print(get_grade(players[1].score), players[1].x_offset + 50, players[1].y_offset+6, 7)
 
   print(players[2].level, 65, 92, 13)
   print(min(999, ceil(players[2].level / 100) * 100), 65, 102, 13)
 
-  print(players[2].score, players[2].x_offset + 8, players[2].y_offset-15, 7)
+  print(get_total_score(players[2]), players[2].x_offset + 8, players[2].y_offset-16, 7)
+  print(get_grade(players[2].score), players[2].x_offset - 8, players[2].y_offset+6, 7)
 end
 
 function render_currents()
@@ -285,6 +287,29 @@ function draw_splits(player)
   for index, split in pairs(player.splits) do
     print((index-1) * 100 .. ": " .. split, player.x_offset + 5, player.y_offset + (8 * index) - 3, 8)
   end
+end
+
+function get_total_score(player)
+  local thousands = player.score_k
+  local hundreds = player.score
+
+  if thousands == 0 then
+    thousands = "000"
+  elseif thousands < 10 then
+    thousands = "00" .. thousands
+  elseif thousands < 100 then
+    thousands = "0" .. thousands
+  end
+
+  if hundreds == 0 then
+    hundreds = "000"
+  elseif hundreds < 10 then
+    hundreds = "00" .. hundreds
+  elseif hundreds < 100 then
+    hundreds = "0" .. hundreds
+  end
+
+  return "" .. thousands .. hundreds
 end
 
 -->8
@@ -468,7 +493,7 @@ function get_level_gravity(level)
   return 5120
 end
 
-function get_grade(player)
+function get_grade(score)
   if score < 400 then
     return '9'
   elseif score < 800 then
@@ -625,6 +650,7 @@ function init_player(num, existing_player)
     alive = true,
     win = false,
     score = 0,
+    score_k = 0,
     combo = 1,
     bravo = 1, -- needs to be implemented
 
@@ -680,9 +706,33 @@ function increase_score(player)
   -- from harddrop:
   -- Score = ((Level + Lines)/4 + Soft) x Lines x Combo x Bravo
   --  https://harddrop.com/wiki/Tetris_The_Grand_Master
-  formula = ((player.level + #player.lines_to_clear)/4 + player.soft_frames) * #player.lines_to_clear * player.combo * player.bravo
+  local formula = ((player.level + #player.lines_to_clear)/4 + player.soft_frames) * #player.lines_to_clear * player.combo * player.bravo
+  local score_k = 0
+
+  if formula < 0 then
+    formula = 32767
+  end
+
+  printh("---------")
+  printh("formula: " .. formula)
+
+  -- run the thousands
+  if formula > 999 then
+    score_k += formula / 1000
+    formula = flr(formula / 1000)
+  end
 
   player.score += flr(formula)
+
+  if player.score > 1000 then
+    score_k += flr(player.score / 1000)
+    player.score -= score_k * 1000
+    player.score_k += score_k
+    --printh("rounded score_k: " .. score_k)
+    --printh("new score_k: " .. flr(score_k))
+    --printh("player.score after: " .. player.score)
+    --printh("player.score_k after: " .. player.score_k)
+  end
 end
 
 function increase_combo(player)
