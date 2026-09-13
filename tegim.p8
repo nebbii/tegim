@@ -954,40 +954,6 @@ function handle_game_input(player)
   local left = btn(0, player.num)
   local right = btn(1, player.num)
 
-  if down then
-    player.soft = true
-  else
-    player.soft = false
-
-    if left and right then
-      player.das = 0
-    elseif left then
-      if player.das == 0 then
-        move_piece(player, 0)
-      elseif player.das <= -16 then
-        move_piece(player, 0)
-      elseif player.das > 0 then
-        move_piece(player, 0)
-        player.das = 0
-      end
-
-      player.das -= 1
-    elseif right then
-      if player.das == 0 then
-        move_piece(player, 1)
-      elseif player.das >= 16 then
-        move_piece(player, 1)
-      elseif player.das < 0 then
-        move_piece(player, 1)
-        player.das = 0
-      end
-
-      player.das += 1
-    else
-      player.das = 0
-    end
-  end
-
   -- rotation
   local x = btn(5, player.num)
   local o = btn(4, player.num)
@@ -1021,6 +987,40 @@ function handle_game_input(player)
     player.rspin = true
   else
     player.rspin = false
+  end
+
+  if down then
+    player.soft = true
+  else
+    player.soft = false
+
+    if left and right then
+      player.das = 0
+    elseif left then
+      if player.das == 0 then
+        move_piece(player, 0)
+      elseif player.das <= -16 then
+        move_piece(player, 0)
+      elseif player.das > 0 then
+        move_piece(player, 0)
+        player.das = 0
+      end
+
+      player.das -= 1
+    elseif right then
+      if player.das == 0 then
+        move_piece(player, 1)
+      elseif player.das >= 16 then
+        move_piece(player, 1)
+      elseif player.das < 0 then
+        move_piece(player, 1)
+        player.das = 0
+      end
+
+      player.das += 1
+    else
+      player.das = 0
+    end
   end
 end
 
