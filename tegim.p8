@@ -335,13 +335,13 @@ function handle_gravity(player)
   end
 
   while player.gravity > 1 do
-    player.row += 1
-
     if check_grounded(player) then
       player.gravity = 0
-    else
-      player.gravity -= 1
+      break
     end
+
+    player.row += 1
+    player.gravity -= 1
   end
 end
 
