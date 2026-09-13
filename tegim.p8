@@ -170,7 +170,7 @@ function render_playfields()
           end
         elseif player.invis and player.alive then
           sprite = 0
-        elseif player.draw_splits and sprite != 0 then
+        elseif (player.draw_splits or player.draw_blocked) and sprite != 0 then
           sprite = 17
         end
 
@@ -193,6 +193,9 @@ function render_playfields()
 
     if player.draw_splits then
       draw_splits(player)
+    end
+    if player.draw_blocked then
+      draw_blocked(player)
     end
   end
 end
@@ -285,6 +288,25 @@ end
 
 function draw_splits(player)
   for index, split in pairs(player.splits) do
+    local key = index * 100
+
+    if index > 10 then break end
+    if key == 1000 then key = 999 end
+
+    local color = 7
+
+    if key == 300 and player.requirement_1
+       or key == 500 and player.requirement_2
+       or key == 999 and player.requirement_3 then
+      color = 10
+    end
+
+    print(key .. ": " .. split, player.x_offset + 5, player.y_offset + (8 * index) - 3, color)
+  end
+end
+
+function draw_blocked(player)
+  for index, split in pairs(player.blocked) do
     local key = index * 100
 
     if index > 10 then break end
@@ -674,7 +696,9 @@ function init_player(num, existing_player)
     requirement_3 = false,
 
     splits = {},
+    blocked = {},
     draw_splits = false,
+    draw_blocked = false,
 
     -- modes
     code = "",
@@ -711,7 +735,11 @@ end
 function increase_level(player, cleared)
   if player.level == 999 and cleared then
     check_requirements(player)
+
     save_split(player)
+    save_blocked(player)
+    player.blocked_levels = 0
+
     player.win = true
   elseif (player.level + 1) % 100 != 0 or cleared then
     player.level += 1
@@ -721,17 +749,19 @@ function increase_level(player, cleared)
 
   if player.level % 100 == 0 and cleared then
     check_requirements(player)
+
     save_split(player)
+    save_blocked(player)
     player.blocked_levels = 0
   end
 end
 
 function check_requirements(player)
-  if player.level == 300 and (player.minutes < 4 or player.minutes == 4 and player.seconds <= 15) and score_k >= 12 then
+  if player.level == 300 and (player.minutes < 4 or player.minutes == 4 and player.seconds <= 15) and player.score_k >= 12 then
     player.requirement_1 = true
-  elseif player.level == 500 and (player.minutes < 7 or player.minutes == 7 and player.seconds <= 30) and score_k >= 40 then
+  elseif player.level == 500 and (player.minutes < 7 or player.minutes == 7 and player.seconds <= 30) and player.score_k >= 40 then
     player.requirement_2 = true
-  elseif player.level == 999 and (player.minutes < 13 or player.minutes == 13 and player.seconds <= 30) and score_k >= 126 then
+  elseif player.level == 999 and (player.minutes < 13 or player.minutes == 13 and player.seconds <= 30) and player.score_k >= 126 then
     player.requirement_3 = true
   end
 
@@ -770,7 +800,11 @@ function save_split(player)
   if minutes < 10 then minutes = "0" .. minutes end
   if seconds < 10 then seconds = "0" .. seconds end
 
-  add(player.splits, minutes .. ":" .. seconds .. "(" .. player.blocked_levels .. "L)")
+  add(player.splits, minutes .. ":" .. seconds)
+end
+
+function save_blocked(player)
+  add(player.blocked, player.blocked_levels .. "L")
 end
 
 function check_grounded(player)
@@ -1086,8 +1120,10 @@ function handle_menu_input(player)
   if o and #player.splits > 0 then
     if player.draw_splits then
       player.draw_splits = false
+      player.draw_blocked = true
     else
       player.draw_splits = true
+      player.draw_blocked = false
     end
   end
 
