@@ -706,33 +706,20 @@ function increase_score(player)
   -- from harddrop:
   -- Score = ((Level + Lines)/4 + Soft) x Lines x Combo x Bravo
   --  https://harddrop.com/wiki/Tetris_The_Grand_Master
-  local formula = ((player.level + #player.lines_to_clear)/4 + player.soft_frames) * #player.lines_to_clear * player.combo * player.bravo
+  local formula = (ceil((player.level + #player.lines_to_clear)/4) + player.soft_frames) * #player.lines_to_clear * player.combo * player.bravo
   local score_k = 0
 
   if formula < 0 then
     formula = 32767
   end
 
-  printh("---------")
-  printh("formula: " .. formula)
-
   -- run the thousands
-  if formula > 999 then
-    score_k += formula / 1000
-    formula = flr(formula / 1000)
-  end
+  player.score_k += flr(formula / 1000)
+  player.score = formula % 1000
 
-  player.score += flr(formula)
-
-  if player.score > 1000 then
-    score_k += flr(player.score / 1000)
-    player.score -= score_k * 1000
-    player.score_k += score_k
-    --printh("rounded score_k: " .. score_k)
-    --printh("new score_k: " .. flr(score_k))
-    --printh("player.score after: " .. player.score)
-    --printh("player.score_k after: " .. player.score_k)
-  end
+  -- check remainder thousands
+  player.score_k += flr(player.score /1000)
+  player.score = player.score % 1000
 end
 
 function increase_combo(player)
