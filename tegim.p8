@@ -559,8 +559,8 @@ function next_piece(player)
   player.column = 4
 
   if is_any_tile_taken(player) then
-    place_piece(player)
     kill_player(player)
+    place_piece(player)
   end
 
   increase_level(player, false)
