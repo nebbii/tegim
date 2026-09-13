@@ -61,7 +61,7 @@ function _init()
   start_insta = false
   start_invis = false
 
-  --music(0)
+  music(0)
 end
 
 function _update60()
@@ -285,7 +285,12 @@ end
 
 function draw_splits(player)
   for index, split in pairs(player.splits) do
-    print((index-1) * 100 .. ": " .. split, player.x_offset + 5, player.y_offset + (8 * index) - 3, 8)
+    local key = index * 100
+
+    if index > 10 then break end
+    if key == 1000 then key = 999 end
+
+    print(key .. ": " .. split, player.x_offset + 5, player.y_offset + (8 * index) - 3, 8)
   end
 end
 
