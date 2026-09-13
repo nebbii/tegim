@@ -666,6 +666,8 @@ function init_player(num, existing_player)
     combo = 1,
     bravo = 1, -- needs to be implemented
 
+    blocked_levels = 0,
+
     win = false,
     requirement_1 = false,
     requirement_2 = false,
@@ -713,11 +715,14 @@ function increase_level(player, cleared)
     player.win = true
   elseif (player.level + 1) % 100 != 0 or cleared then
     player.level += 1
+  elseif (player.level + 1) % 100 == 0 and not cleared then
+    player.blocked_levels += 1
   end
 
   if player.level % 100 == 0 and cleared then
     check_requirements(player)
     save_split(player)
+    player.blocked_levels = 0
   end
 end
 
@@ -765,7 +770,7 @@ function save_split(player)
   if minutes < 10 then minutes = "0" .. minutes end
   if seconds < 10 then seconds = "0" .. seconds end
 
-  add(player.splits, minutes .. ":" .. seconds)
+  add(player.splits, minutes .. ":" .. seconds .. "(" .. player.blocked_levels .. "L)")
 end
 
 function check_grounded(player)
