@@ -290,7 +290,15 @@ function draw_splits(player)
     if index > 10 then break end
     if key == 1000 then key = 999 end
 
-    print(key .. ": " .. split, player.x_offset + 5, player.y_offset + (8 * index) - 3, 7)
+    local color = 7
+
+    if key == 300 and player.requirement_1
+       or key == 500 and player.requirement_2
+       or key == 999 and player.requirement_3 then
+      color = 10
+    end
+
+    print(key .. ": " .. split, player.x_offset + 5, player.y_offset + (8 * index) - 3, color)
   end
 end
 
