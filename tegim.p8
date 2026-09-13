@@ -353,8 +353,8 @@ function handle_lock(player)
     if #lines_to_clear > 0 then
       player.lines_to_clear = lines_to_clear
 
-      increase_score(player)
       increase_combo(player)
+      increase_score(player)
 
       player.clear = 41
     else
@@ -707,7 +707,6 @@ function increase_score(player)
   -- Score = ((Level + Lines)/4 + Soft) x Lines x Combo x Bravo
   --  https://harddrop.com/wiki/Tetris_The_Grand_Master
   local formula = (ceil((player.level + #player.lines_to_clear)/4) + player.soft_frames) * #player.lines_to_clear * player.combo * player.bravo
-  local score_k = 0
 
   if formula < 0 then
     formula = 32767
@@ -715,7 +714,7 @@ function increase_score(player)
 
   -- run the thousands
   player.score_k += flr(formula / 1000)
-  player.score = formula % 1000
+  player.score += formula % 1000
 
   -- check remainder thousands
   player.score_k += flr(player.score /1000)
