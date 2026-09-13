@@ -168,10 +168,10 @@ function render_playfields()
           else
             sprite = 6
           end
-        else
-          if player.invis and player.alive then
-            sprite = 0
-          end
+        elseif player.invis and player.alive then
+          sprite = 0
+        elseif player.draw_splits and sprite != 0 then
+          sprite = 17
         end
 
         spr(sprite, player.x_offset+4*x, player.y_offset+(4*y)-8, 0.5, 0.5)
@@ -290,7 +290,7 @@ function draw_splits(player)
     if index > 10 then break end
     if key == 1000 then key = 999 end
 
-    print(key .. ": " .. split, player.x_offset + 5, player.y_offset + (8 * index) - 3, 8)
+    print(key .. ": " .. split, player.x_offset + 5, player.y_offset + (8 * index) - 3, 7)
   end
 end
 
