@@ -653,11 +653,15 @@ function init_player(num, existing_player)
     soft_frames = 0,
 
     alive = true,
-    win = false,
     score = 0,
     score_k = 0,
     combo = 1,
     bravo = 1, -- needs to be implemented
+
+    win = false,
+    requirement_1 = false,
+    requirement_2 = false,
+    requirement_3 = false,
 
     splits = {},
     draw_splits = false,
@@ -696,6 +700,7 @@ end
 
 function increase_level(player, cleared)
   if player.level == 999 and cleared then
+    check_requirements(player)
     save_split(player)
     player.win = true
   elseif (player.level + 1) % 100 != 0 or cleared then
@@ -703,7 +708,22 @@ function increase_level(player, cleared)
   end
 
   if player.level % 100 == 0 and cleared then
+    check_requirements(player)
     save_split(player)
+  end
+end
+
+function check_requirements(player)
+  if player.level == 300 and (player.minutes < 4 or player.minutes == 4 and player.seconds <= 15) and score_k >= 12 then
+    player.requirement_1 = true
+  elseif player.level == 500 and (player.minutes < 7 or player.minutes == 7 and player.seconds <= 30) and score_k >= 40 then
+    player.requirement_2 = true
+  elseif player.level == 999 and (player.minutes < 13 or player.minutes == 13 and player.seconds <= 30) and score_k >= 126 then
+    player.requirement_3 = true
+  end
+
+  if player.requirement_1 and player.requirement_2 and player.requirement_3 then
+    player.win = true
   end
 end
 
