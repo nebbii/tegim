@@ -170,7 +170,9 @@ function render_playfields()
           end
 
           -- nebi animation
-          spr(161, 48, 24, 4, 2)
+          if #player.lines_to_clear >= 4 then
+            spr(161, 48, 24, 4, 2)
+          end
         elseif player.invis and player.alive then
           sprite = 0
         elseif (player.draw_splits or player.draw_blocked) and sprite != 0 then
@@ -1496,4 +1498,3 @@ __music__
 00 25262712
 00 28292a12
 02 01021a0a
-
