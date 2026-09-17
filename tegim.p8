@@ -666,7 +666,7 @@ function init_player(num, existing_player)
     history = {2, 2, 2, 2},
     column = 4,
     row = 2,
-    level = 99,
+    level = 1,
     gravity = 0,
     lines_to_clear = {},
 
@@ -1462,4 +1462,3 @@ __music__
 00 25262712
 00 28292a12
 02 01021a0a
-
