@@ -3,6 +3,9 @@ version 43
 __lua__
 function _init()
   three_button_spin = true
+  keyboard_mode = false
+  poke(0x5f2d, 1)
+
   pal(15, 140, 1) -- more visible on crts
 
   dropped_fps = 0
@@ -106,7 +109,7 @@ function _draw()
   render_status()
   render_previews()
   render_currents()
-  render_debug()
+  --render_debug()
 end
 
 -->8
@@ -224,6 +227,10 @@ function render_status()
 
   print(get_total_score(players[2]), players[2].x_offset + 8, players[2].y_offset-16, 7)
   print(get_grade(players[2].score, players[2].score_k), players[2].x_offset - 8, players[2].y_offset+6, 7)
+
+  if keyboard_mode then
+    print('kb', 80, 2, 13)
+  end
 end
 
 function render_currents()
@@ -246,6 +253,7 @@ function render_debug()
   if (60 % stat(7)) > 0 then
     dropped_fps += 60 % stat(7)
   end
+
   --print('lock: ' .. players[1].lock, 20, 2)
   --print('lock: ' .. players[1].lock, 20, 2)
   --print('are: ' .. players[1].are, 50, 2)
@@ -1049,6 +1057,16 @@ function handle_game_input(player)
   local o = btn(4, player.num)
   local up = btn(2, player.num)
 
+  if keyboard_mode and player.num == 0 then
+    down = stat(28, 27)
+    left = stat(28, 29)
+    right = stat(28, 6)
+
+    x = stat(28, 16)
+    o = stat(28, 54)
+    up = stat(28, 55)
+  end
+
   if x then
     if not player.lspin then
       spin_piece(player, 0)
@@ -1172,6 +1190,10 @@ function handle_menu_input(player)
     end
   end
 
+  -- secret keyboard mode
+  if stat(34) == 1 then
+    keyboard_mode = true
+  end
 end
 
 __gfx__
