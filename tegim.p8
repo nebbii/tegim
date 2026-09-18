@@ -230,6 +230,7 @@ function render_status()
 
   if keyboard_mode then
     print('kb', 80, 2, 13)
+    --print(players[1].code, 40, 2, 13)
   end
 end
 
@@ -1143,6 +1144,20 @@ function handle_menu_input(player)
   local held_x = btn(5, player.num)
   local held_o = btn(4, player.num)
 
+  if keyboard_mode and player.num == 0 then
+    local key = stat(31)
+
+    left = key == 'z'
+    right = key == 'c'
+    up = key == '.'
+    down = key == 'x'
+    x = key == 'm'
+    o = key == ','
+
+    held_x = stat(28, 16)
+    held_o = stat(28, 54)
+  end
+
   if held_x and not held_o then
     player.lspin = true
   elseif player.lspin and not held_x and not held_o and player.delay <= 0 then
@@ -1177,11 +1192,11 @@ function handle_menu_input(player)
       player.code = player.code .. '3'
     end
 
-    if #player.code > 8 then
-      player.code = sub(player.code, 2, 9)
+    if #player.code > 6 then
+      player.code = sub(player.code, 2, 7)
     end
 
-    if player.code == "33333333" then
+    if player.code == "333333" then
       player.start_insta = true
     end
 
