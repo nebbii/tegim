@@ -193,10 +193,10 @@ function render_playfields()
     end
 
     if player.start_invis then
-      print('invis', 20, 2, 11)
+      print('INVIS', player.x_offset+14, player.y_offset+20, 11)
     end
     if player.start_insta then
-      print('20G', 50, 2, 11)
+      print('20G', player.x_offset+14, player.y_offset+30, 11)
     end
 
     draw_timer(player)
