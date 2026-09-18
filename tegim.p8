@@ -5,6 +5,8 @@ function _init()
   three_button_spin = true
   pal(15, 140, 1) -- more visible on crts
 
+  dropped_fps = 0
+
   pieces = {
     { -- i
       {{0,1},{1,1},{2,1},{3,1}},
@@ -104,7 +106,7 @@ function _draw()
   render_status()
   render_previews()
   render_currents()
-  --render_debug()
+  render_debug()
 end
 
 -->8
@@ -237,11 +239,17 @@ function render_currents()
 end
 
 function render_debug()
-  print(players[1].gravity, 2, 2, 11)
   --print(players[1].grounded, 8, 2)
-  print('lock: ' .. players[1].lock, 20, 2)
-  print('are: ' .. players[1].are, 50, 2)
-  print('clear: ' .. players[1].clear, 80, 2)
+  print(stat(7), 2, 2, 11)
+  print(dropped_fps, 25, 2)
+
+  if (60 % stat(7)) > 0 then
+    dropped_fps += 60 % stat(7)
+  end
+  --print('lock: ' .. players[1].lock, 20, 2)
+  --print('lock: ' .. players[1].lock, 20, 2)
+  --print('are: ' .. players[1].are, 50, 2)
+  --print('clear: ' .. players[1].clear, 80, 2)
 
 	--for x=1,10 do
 	--	for y=1,20 do
