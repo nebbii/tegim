@@ -248,10 +248,10 @@ end
 
 function render_debug()
   --print(players[1].grounded, 8, 2)
-  print(stat(7), 2, 2, 11)
-  print(dropped_fps, 25, 2)
+  --print(stat(9), 2, 2, 11)
+  --print(dropped_fps, 25, 2)
 
-  if (60 % stat(7)) > 0 then
+  if (60 % stat(9)) > 0 then
     dropped_fps += 60 % stat(7)
   end
 
